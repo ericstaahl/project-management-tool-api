@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model project {
+  project_id        Int       @id @default(autoincrement())
+  title             String?   @db.VarChar(255)
+  number_of_members Int?
+  start_date        DateTime? @db.Date
+  due_date          DateTime? @db.Date
+}
