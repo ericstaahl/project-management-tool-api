@@ -1,5 +1,5 @@
 import fastify from 'fastify';
-import { getProjects } from './controllers/project_controller';
+import { getProjects, createProject } from './controllers/project_controller';
 import cors from '@fastify/cors';
 
 const server = fastify({ logger: true });
@@ -21,6 +21,11 @@ server.get('/', async (request, reply) => {
 
 server.get('/projects', async (request, reply) => {
   reply.send(await getProjects());
+});
+
+server.post('/projects', async (request, reply) => {
+  console.log(request);
+  if (request.body) reply.send(await createProject(request.body));
 });
 
 const start = async () => {
