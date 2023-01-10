@@ -9,8 +9,8 @@ datasource db {
 
 model project {
   project_id        Int       @id @default(autoincrement())
-  title             String?   @db.VarChar(255)
+  title             String   @db.VarChar(255)
   number_of_members Int?
-  start_date        DateTime? @db.Date
-  due_date          DateTime? @db.Date
+  start_date        DateTime @db.Date
+  due_date          DateTime @db.Date
 }
