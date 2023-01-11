@@ -1,11 +1,11 @@
 import prisma from '../prisma';
 
 interface Project {
-  title?: string;
+  title: string;
   project_id?: number;
   number_of_members?: number;
-  start_date?: string;
-  due_date?: string;
+  start_date: string;
+  due_date: string;
 }
 
 export async function getProjects() {

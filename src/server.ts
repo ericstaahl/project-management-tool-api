@@ -1,6 +1,18 @@
-import fastify from 'fastify';
+import fastify, { FastifyRequest } from 'fastify';
 import { getProjects, createProject } from './controllers/project_controller';
 import cors from '@fastify/cors';
+
+interface Project {
+  title: string;
+  project_id?: number;
+  number_of_members?: number;
+  start_date: string;
+  due_date: string;
+}
+
+type CreateProjectRequest = FastifyRequest<{
+  Body: Project;
+}>;
 
 const server = fastify({ logger: true });
 
@@ -23,8 +35,8 @@ server.get('/projects', async (request, reply) => {
   reply.send(await getProjects());
 });
 
-server.post('/projects', async (request, reply) => {
-  console.log(request);
+server.post('/projects', async (request: CreateProjectRequest, reply) => {
+  console.log(typeof request.body);
   if (request.body) reply.send(await createProject(request.body));
 });
 
