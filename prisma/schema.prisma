@@ -8,9 +8,19 @@ datasource db {
 }
 
 model project {
-  project_id        Int       @id @default(autoincrement())
+  project_id        Int      @id @default(autoincrement())
   title             String   @db.VarChar(255)
   number_of_members Int?
   start_date        DateTime @db.Date
   due_date          DateTime @db.Date
+  todo              todo[]
+}
+
+model todo {
+  todo_id     Int     @id @default(autoincrement())
+  title       String  @db.VarChar(255)
+  estimate    String  @db.VarChar(255)
+  description String  @db.VarChar(255)
+  project_id  Int
+  project     project @relation(fields: [project_id], references: [project_id])
 }

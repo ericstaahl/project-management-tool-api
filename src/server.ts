@@ -1,6 +1,7 @@
 import fastify, { FastifyRequest } from 'fastify';
 import { getProjects, createProject } from './controllers/project_controller';
 import cors from '@fastify/cors';
+import { getTodos } from './controllers/todo_controller';
 
 interface Project {
   title: string;
@@ -36,9 +37,21 @@ server.get('/projects', async (request, reply) => {
 });
 
 server.post('/projects', async (request: CreateProjectRequest, reply) => {
-  console.log(typeof request.body);
   if (request.body) reply.send(await createProject(request.body));
 });
+
+server.get(
+  '/todos/:id',
+  async (
+    request: FastifyRequest<{
+      Params: { id: number };
+    }>,
+    reply
+  ) => {
+    const projectId = Number(request.params.id);
+    reply.send(await getTodos(projectId));
+  }
+);
 
 const start = async () => {
   try {
