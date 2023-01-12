@@ -13,7 +13,6 @@ export async function getProjects() {
 }
 
 export async function createProject(data: Project) {
-  console.log(data);
   if (data.start_date) {
     data.start_date = new Date(data.start_date).toISOString();
   }
