@@ -1,5 +1,10 @@
+import { Prisma } from '@prisma/client';
 import { FastifyRequest, FastifyInstance } from 'fastify';
-import { getTodos } from '../../controllers/todo_controller';
+import { getTodos, addTodo } from '../../controllers/todo_controller';
+
+type AddTodoRequst = FastifyRequest<{
+  Body: Prisma.todoCreateManyInput;
+}>;
 
 export default async function (fastify: FastifyInstance) {
   fastify.get(
@@ -14,4 +19,9 @@ export default async function (fastify: FastifyInstance) {
       reply.send(await getTodos(projectId));
     }
   );
+
+  fastify.post('/:id', async (request: AddTodoRequst, reply) => {
+    console.log(request.body);
+    if (request.body) reply.send(await addTodo(request.body));
+  });
 }

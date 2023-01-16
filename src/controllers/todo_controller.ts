@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import prisma from '../prisma';
 
 export async function getTodos(projectId: number) {
@@ -5,5 +6,12 @@ export async function getTodos(projectId: number) {
     where: {
       project_id: projectId,
     },
+  });
+}
+
+export async function addTodo(data: Prisma.todoCreateManyInput) {
+  console.log(data);
+  return await prisma.todo.create({
+    data,
   });
 }
