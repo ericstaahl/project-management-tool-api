@@ -2,13 +2,18 @@ import fastify from 'fastify';
 import cors from '@fastify/cors';
 import autoLoad from '@fastify/autoload';
 import path from 'path';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const server = fastify({ logger: true });
+
+const allowedHostname = process.env.ALLOWED_HOSTNAME;
 
 server.register(cors, {
   origin: (origin, cb) => {
     const hostname = new URL(origin).hostname;
-    if (hostname === 'localhost') {
+    if (hostname === allowedHostname) {
       cb(null, true);
       return;
     }

@@ -6,6 +6,7 @@ interface Project {
   number_of_members?: number;
   start_date: string;
   due_date: string;
+  user_id: number;
 }
 
 export async function getProjects() {
