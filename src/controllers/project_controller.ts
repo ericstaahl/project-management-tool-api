@@ -1,3 +1,4 @@
+import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 
 interface Project {
@@ -9,8 +10,11 @@ interface Project {
   user_id: number;
 }
 
-export async function getProjects() {
-  return await prisma.project.findMany();
+export async function getProjects(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  return reply.send(await prisma.project.findMany());
 }
 
 export async function createProject(data: Project) {

@@ -3,6 +3,7 @@ import {
   getProjects,
   createProject,
 } from '../../controllers/project_controller';
+import { server } from '../../server';
 
 interface Project {
   title: string;
@@ -18,9 +19,7 @@ type CreateProjectRequest = FastifyRequest<{
 }>;
 
 export default async function (fastify: FastifyInstance) {
-  fastify.get('/', async (request, reply) => {
-    reply.send(await getProjects());
-  });
+  fastify.get('/', { preHandler: [server.verifyJwt] }, getProjects);
 
   fastify.post('/', async (request: CreateProjectRequest, reply) => {
     if (request.body) reply.send(await createProject(request.body));

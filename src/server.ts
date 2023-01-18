@@ -3,12 +3,17 @@ import cors from '@fastify/cors';
 import autoLoad from '@fastify/autoload';
 import path from 'path';
 import * as dotenv from 'dotenv';
-import fastifyAuth from '@fastify/auth';
 import fastifyJwt from '@fastify/jwt';
 
 dotenv.config();
 
 export const server = fastify({ logger: true });
+
+declare module 'fastify' {
+  export interface FastifyInstance {
+    verifyJwt: (request: FastifyRequest, reply: FastifyReply) => void;
+  }
+}
 
 const ALLOWED_HOSTNAME = process.env.ALLOWED_HOSTNAME;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
@@ -30,11 +35,10 @@ if (ACCESS_TOKEN_SECRET) {
   console.error('No access token secret provided. Check env variables.');
   process.exit(1);
 }
-server.register(fastifyAuth);
 
 server.decorate(
   'verifyJwt',
-  async (request: FastifyRequest, reply: FastifyReply, done: any) => {
+  async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       await request.jwtVerify();
     } catch (error) {
