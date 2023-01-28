@@ -67,7 +67,8 @@ export async function login(request: LoginRequest, reply: FastifyReply) {
   if (res) {
     const { password, ...rest } = user;
     return reply.code(200).send({
-      access_token: server.jwt.sign({ rest }, { expiresIn: '4h' }),
+      ...rest,
+      token: server.jwt.sign({ user: rest }, { expiresIn: '4h' }),
     });
   }
   return reply.code(401).send({
