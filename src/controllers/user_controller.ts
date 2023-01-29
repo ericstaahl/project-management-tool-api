@@ -18,6 +18,12 @@ type LoginRequest = FastifyRequest<{
   Body: z.infer<typeof LoginSchema>;
 }>;
 
+type NewTokenRequest = FastifyRequest<{
+  Body: {
+    token: string;
+  };
+}>;
+
 // data: z.infer<typeof User>
 export async function register(request: FastifyRequest, reply: FastifyReply) {
   try {
@@ -83,10 +89,13 @@ export async function login(request: LoginRequest, reply: FastifyReply) {
   });
 }
 
-export async function newToken(request: LoginRequest, reply: FastifyReply) {
-  const token = request.headers.authorization?.split(' ')[1];
+export async function newToken(request: NewTokenRequest, reply: FastifyReply) {
+  const token = request.body.token;
   if (token === undefined) {
-    throw new Error();
+    reply.code(400).send({
+      message: 'No refresh token provided',
+    });
+    return;
   }
   server.jwt.verify(token, (err, decoded) => {
     if (err) throw err;
