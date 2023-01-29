@@ -41,6 +41,20 @@ server.decorate(
   async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       await request.jwtVerify();
+      // console.log(decoded.type);
+      // if (decoded.type === 'refresh_token') {
+      //   const newAccessToken = server.jwt.sign(
+      //     { user: decoded.user, type: 'access_token' },
+      //     { expiresIn: '4h' }
+      //   );
+      //   reply.send({
+      //     message: 'You need a new token',
+      //     access_token: newAccessToken,
+      //   });
+      // }
+      // if (decoded.type !== 'access_token') {
+      //   throw new Error('not a valid token');
+      // }
     } catch (error) {
       reply.send(error);
     }

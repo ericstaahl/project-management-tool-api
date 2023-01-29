@@ -68,10 +68,42 @@ export async function login(request: LoginRequest, reply: FastifyReply) {
     const { password, ...rest } = user;
     return reply.code(200).send({
       ...rest,
-      token: server.jwt.sign({ user: rest }, { expiresIn: '4h' }),
+      access_token: server.jwt.sign(
+        { user: rest, type: 'access_token' },
+        { expiresIn: '4h' }
+      ),
+      refresh_token: server.jwt.sign(
+        { user: rest, type: 'refresh_token' },
+        { expiresIn: '12h' }
+      ),
     });
   }
   return reply.code(401).send({
     message: 'Incorrect username or password provided.',
+  });
+}
+
+export async function newToken(request: LoginRequest, reply: FastifyReply) {
+  const token = request.headers.authorization?.split(' ')[1];
+  if (token === undefined) {
+    throw new Error();
+  }
+  server.jwt.verify(token, (err, decoded) => {
+    if (err) throw err;
+    if (decoded.type === 'refresh_token') {
+      console.log(decoded);
+      const newAccessToken = server.jwt.sign(
+        { user: decoded.user, type: 'access_token' },
+        { expiresIn: '4h' }
+      );
+      reply.code(200).send({
+        user: decoded.user,
+        access_token: newAccessToken,
+      });
+    } else {
+      reply.code(401).send({
+        message: 'The provided token was not a refresh token.',
+      });
+    }
   });
 }
