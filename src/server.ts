@@ -11,7 +11,7 @@ export const server = fastify({ logger: true });
 
 declare module 'fastify' {
   export interface FastifyInstance {
-    verifyJwt: (request: FastifyRequest, reply: FastifyReply) => void;
+    verifyJwt: (request: FastifyRequest, reply: FastifyReply) => any;
   }
 }
 
@@ -42,7 +42,7 @@ server.decorate(
     try {
       await request.jwtVerify();
     } catch (error) {
-      reply.send(error);
+      return reply.send(error);
     }
   }
 );

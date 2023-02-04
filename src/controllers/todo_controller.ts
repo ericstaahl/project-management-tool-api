@@ -1,17 +1,98 @@
 import { Prisma } from '@prisma/client';
+import { AddTodo } from '../schemas/todo_schema';
+import { FastifyReply } from 'fastify';
+import { FastifyRequest } from 'fastify';
 import prisma from '../prisma';
+import { server } from '../server';
 
-export async function getTodos(projectId: number) {
-  return await prisma.todo.findMany({
-    where: {
-      project_id: projectId,
-    },
-  });
+type AddTodoRequst = FastifyRequest<{
+  Body: AddTodo;
+  Params: { id: string };
+}>;
+
+type getTodoRequest = FastifyRequest<{
+  Params: { id: string };
+}>;
+
+interface DecodedJwt {
+  user: {
+    user_id: number;
+    username: string;
+  };
+  iat: number;
+  exp: number;
 }
 
-export async function addTodo(data: Prisma.todoCreateManyInput) {
-  console.log(data);
-  return await prisma.todo.create({
-    data,
-  });
+export async function getTodos(request: getTodoRequest, reply: FastifyReply) {
+  const { id: projectId } = request.params;
+  if (
+    request.headers.authorization &&
+    request.headers.authorization.startsWith('Bearer')
+  ) {
+    const userInfo: DecodedJwt | null = server.jwt.decode(
+      request.headers.authorization.split(' ')[1]
+    );
+
+    // check if user has access to project
+    if (userInfo?.user.user_id) {
+      try {
+        await prisma.project.findFirstOrThrow({
+          where: {
+            project_id: Number(projectId),
+            user_id: userInfo.user.user_id,
+          },
+        });
+      } catch (err) {
+        reply
+          .status(401)
+          .send({ message: `You don't have access to this project.` });
+        throw err;
+      }
+    }
+
+    return reply.send(
+      await prisma.todo.findMany({
+        where: {
+          project_id: Number(projectId),
+        },
+      })
+    );
+  }
+}
+
+export async function addTodo(request: AddTodoRequst, reply: FastifyReply) {
+  const data = request.body;
+  const { id: projectId } = request.params;
+
+  if (
+    request.headers.authorization &&
+    request.headers.authorization.startsWith('Bearer')
+  ) {
+    const userInfo: DecodedJwt | null = server.jwt.decode(
+      request.headers.authorization.split(' ')[1]
+    );
+
+    // check if user has access to project
+    if (userInfo?.user.user_id) {
+      try {
+        await prisma.project.findFirstOrThrow({
+          where: {
+            project_id: Number(projectId),
+            user_id: userInfo.user.user_id,
+          },
+        });
+      } catch (err) {
+        return reply
+          .status(401)
+          .send({ message: `You don't have access to this project.` });
+      }
+    }
+
+    const dataToSave: Prisma.todoUncheckedCreateInput = {
+      ...data,
+      project_id: Number(projectId),
+    };
+
+    return reply.send(await prisma.todo.create({ data: dataToSave }));
+  }
 }

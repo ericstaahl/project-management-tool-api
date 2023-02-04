@@ -1,27 +1,35 @@
-import { Prisma } from '@prisma/client';
-import { FastifyRequest, FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyRequest } from 'fastify';
 import { getTodos, addTodo } from '../../controllers/todo_controller';
-
-type AddTodoRequst = FastifyRequest<{
-  Body: Prisma.todoCreateManyInput;
-}>;
+import { AddTodo } from '../../schemas/todo_schema';
+import verifyAccessToken from '../../utilities/verifyAccessToken';
 
 export default async function (fastify: FastifyInstance) {
   fastify.get(
     '/:id',
-    async (
-      request: FastifyRequest<{
-        Params: { id: number };
-      }>,
-      reply
-    ) => {
-      const projectId = Number(request.params.id);
-      reply.send(await getTodos(projectId));
-    }
+    {
+      preHandler: [
+        verifyAccessToken<
+          FastifyRequest<{
+            Params: { id: string };
+          }>
+        >,
+      ],
+    },
+    getTodos
   );
 
-  fastify.post('/:id', async (request: AddTodoRequst, reply) => {
-    console.log(request.body);
-    if (request.body) reply.send(await addTodo(request.body));
-  });
+  fastify.post(
+    '/:id',
+    {
+      preHandler: [
+        verifyAccessToken<
+          FastifyRequest<{
+            Body: AddTodo;
+            Params: { id: string };
+          }>
+        >,
+      ],
+    },
+    addTodo
+  );
 }
