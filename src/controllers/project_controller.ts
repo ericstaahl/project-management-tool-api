@@ -3,15 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 import { server } from '../server';
 import { Prisma } from '@prisma/client';
-
-interface DecodedJwt {
-  user: {
-    user_id: number;
-    username: string;
-  };
-  iat: number;
-  exp: number;
-}
+import getUserFromJwt from '../utilities/getUserFromJwt';
 
 export async function getProjects(
   request: FastifyRequest,
@@ -21,7 +13,7 @@ export async function getProjects(
     request.headers.authorization &&
     request.headers.authorization.startsWith('Bearer')
   ) {
-    const userInfo: DecodedJwt | null = server.jwt.decode(
+    const userInfo = getUserFromJwt(
       request.headers.authorization.split(' ')[1]
     );
 
@@ -63,7 +55,7 @@ export async function createProject(
     request.headers.authorization &&
     request.headers.authorization.startsWith('Bearer')
   ) {
-    const userInfo: DecodedJwt | null = server.jwt.decode(
+    const userInfo = getUserFromJwt(
       request.headers.authorization.split(' ')[1]
     );
 
