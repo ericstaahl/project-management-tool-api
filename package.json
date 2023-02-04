@@ -17,6 +17,7 @@
     "@fastify/jwt": "^6.5.0",
     "@prisma/client": "^4.9.0",
     "bcrypt": "^5.1.0",
+    "debug": "^4.3.4",
     "dotenv": "^16.0.3",
     "fastify": "^4.11.0",
     "zod": "^3.20.2"
