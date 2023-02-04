@@ -17,7 +17,27 @@ export async function getProjects(
   request: FastifyRequest,
   reply: FastifyReply
 ) {
-  return reply.send(await prisma.project.findMany());
+  if (
+    request.headers.authorization &&
+    request.headers.authorization.startsWith('Bearer')
+  ) {
+    const userInfo: DecodedJwt | null = server.jwt.decode(
+      request.headers.authorization.split(' ')[1]
+    );
+
+    if (!userInfo?.user.user_id) {
+      return reply.code(401).send({ message: 'No user id present in token.' });
+    }
+
+    return reply.send(
+      await prisma.project.findMany({
+        where: {
+          user_id: userInfo?.user.user_id,
+        },
+      })
+    );
+  }
+  return reply.code(401).send({ message: 'No access token provided.' });
 }
 
 export async function createProject(
