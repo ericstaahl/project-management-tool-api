@@ -4,6 +4,7 @@ import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 import { server } from '../server';
+import getUserFromJwt from '../utilities/getUserFromJwt';
 
 type AddTodoRequst = FastifyRequest<{
   Body: AddTodo;
@@ -14,22 +15,13 @@ type getTodoRequest = FastifyRequest<{
   Params: { id: string };
 }>;
 
-interface DecodedJwt {
-  user: {
-    user_id: number;
-    username: string;
-  };
-  iat: number;
-  exp: number;
-}
-
 export async function getTodos(request: getTodoRequest, reply: FastifyReply) {
   const { id: projectId } = request.params;
   if (
     request.headers.authorization &&
     request.headers.authorization.startsWith('Bearer')
   ) {
-    const userInfo: DecodedJwt | null = server.jwt.decode(
+    const userInfo = getUserFromJwt(
       request.headers.authorization.split(' ')[1]
     );
 
@@ -68,7 +60,7 @@ export async function addTodo(request: AddTodoRequst, reply: FastifyReply) {
     request.headers.authorization &&
     request.headers.authorization.startsWith('Bearer')
   ) {
-    const userInfo: DecodedJwt | null = server.jwt.decode(
+    const userInfo = getUserFromJwt(
       request.headers.authorization.split(' ')[1]
     );
 
