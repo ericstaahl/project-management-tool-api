@@ -26,6 +26,14 @@ export async function getProjects(
         where: {
           user_id: userInfo?.user.user_id,
         },
+        include: {
+          _count: {
+            select: { todo: true },
+          },
+        },
+        orderBy: {
+          due_date: 'asc',
+        },
       })
     );
   }
