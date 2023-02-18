@@ -4,11 +4,23 @@ import {
   createProject,
 } from '../../controllers/project_controller';
 import { AddProject } from '../../schemas/project_schema';
-import { server } from '../../server';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
 export default async function (fastify: FastifyInstance) {
-  fastify.get('/', { preHandler: [server.verifyJwt] }, getProjects);
+  fastify.get(
+    '/',
+    {
+      preHandler: [
+        verifyAccessToken<
+          FastifyRequest<{
+            Params: { id: string };
+            Querystring: { sortRule: 'due_date' | 'title' | 'todo' };
+          }>
+        >,
+      ],
+    },
+    getProjects
+  );
   fastify.post(
     '/',
     {

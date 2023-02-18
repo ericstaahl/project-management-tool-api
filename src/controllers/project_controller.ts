@@ -1,14 +1,20 @@
 import { AddProject } from '../schemas/project_schema';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
-import { server } from '../server';
 import { Prisma } from '@prisma/client';
 import getUserFromJwt from '../utilities/getUserFromJwt';
 
+type GetProjectsRequest = FastifyRequest<{
+  Querystring: { sortRule: 'due_date' | 'title' | 'todo' };
+}>;
+
 export async function getProjects(
-  request: FastifyRequest,
+  request: GetProjectsRequest,
   reply: FastifyReply
 ) {
+  const sortRule = request.query['sortRule'];
+  console.log('sortBy', sortRule);
+  console.log('The request', request);
   if (
     request.headers.authorization &&
     request.headers.authorization.startsWith('Bearer')
@@ -32,7 +38,7 @@ export async function getProjects(
           },
         },
         orderBy: {
-          due_date: 'asc',
+          [sortRule]: sortRule === 'todo' ? { _count: 'asc' } : 'asc',
         },
       })
     );

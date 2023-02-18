@@ -3,7 +3,6 @@ import { AddTodo } from '../schemas/todo_schema';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify';
 import prisma from '../prisma';
-import { server } from '../server';
 import getUserFromJwt from '../utilities/getUserFromJwt';
 
 type AddTodoRequst = FastifyRequest<{
@@ -11,11 +10,11 @@ type AddTodoRequst = FastifyRequest<{
   Params: { id: string };
 }>;
 
-type getTodoRequest = FastifyRequest<{
+type GetTodoRequest = FastifyRequest<{
   Params: { id: string };
 }>;
 
-export async function getTodos(request: getTodoRequest, reply: FastifyReply) {
+export async function getTodos(request: GetTodoRequest, reply: FastifyReply) {
   const { id: projectId } = request.params;
   if (
     request.headers.authorization &&

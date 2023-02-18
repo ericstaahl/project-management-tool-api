@@ -1,3 +1,4 @@
+import { todo } from '@prisma/client';
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { getTodos, addTodo } from '../../controllers/todo_controller';
 import { AddTodo } from '../../schemas/todo_schema';
@@ -10,7 +11,7 @@ export default async function (fastify: FastifyInstance) {
       preHandler: [
         verifyAccessToken<
           FastifyRequest<{
-            Params: { id: string };
+            Params: { id: string; sortBy: todo['status'] };
           }>
         >,
       ],
