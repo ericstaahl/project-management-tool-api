@@ -5,7 +5,10 @@ import { Prisma } from '@prisma/client';
 import getUserFromJwt from '../utilities/getUserFromJwt';
 
 type GetProjectsRequest = FastifyRequest<{
-    Querystring: { sortRule: 'due_date' | 'title' | 'todo' };
+    Querystring: {
+        sortRule: 'due_date' | 'title' | 'todo';
+        sortOrder: 'asc' | 'desc';
+    };
 }>;
 
 export async function getProjects(
@@ -13,8 +16,8 @@ export async function getProjects(
     reply: FastifyReply
 ) {
     const sortRule = request.query['sortRule'];
-    console.log('sortBy', sortRule);
-    console.log('The request', request);
+    const sortOrder = request.query['sortOrder'];
+
     if (
         request.headers.authorization &&
         request.headers.authorization.startsWith('Bearer')
@@ -40,7 +43,8 @@ export async function getProjects(
                     },
                 },
                 orderBy: {
-                    [sortRule]: sortRule === 'todo' ? { _count: 'asc' } : 'asc',
+                    [sortRule]:
+                        sortRule === 'todo' ? { _count: sortOrder } : sortOrder,
                 },
             })
         );
