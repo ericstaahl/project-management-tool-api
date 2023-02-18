@@ -16,6 +16,7 @@ export default async function (fastify: FastifyInstance) {
                         Params: { id: string };
                         Querystring: {
                             sortRule: 'due_date' | 'title' | 'todo';
+                            statusFilter: string;
                         };
                     }>
                 >,

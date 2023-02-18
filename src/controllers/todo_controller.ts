@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, todo } from '@prisma/client';
 import { AddTodo } from '../schemas/todo_schema';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify';
@@ -12,10 +12,17 @@ type AddTodoRequst = FastifyRequest<{
 
 type GetTodoRequest = FastifyRequest<{
     Params: { id: string };
+    Querystring: {
+        sortRule: 'title' | 'estimate';
+        statusFilter: todo['status'];
+    };
 }>;
 
 export async function getTodos(request: GetTodoRequest, reply: FastifyReply) {
     const { id: projectId } = request.params;
+    const sortRule = request.query['sortRule'];
+    const statusFilter = request.query['statusFilter'];
+
     if (
         request.headers.authorization &&
         request.headers.authorization.startsWith('Bearer')
@@ -45,6 +52,10 @@ export async function getTodos(request: GetTodoRequest, reply: FastifyReply) {
             await prisma.todo.findMany({
                 where: {
                     project_id: Number(projectId),
+                    status: statusFilter,
+                },
+                orderBy: {
+                    [sortRule]: 'asc',
                 },
             })
         );

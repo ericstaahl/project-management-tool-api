@@ -11,7 +11,10 @@ export default async function (fastify: FastifyInstance) {
             preHandler: [
                 verifyAccessToken<
                     FastifyRequest<{
-                        Params: { id: string; sortBy: todo['status'] };
+                        Params: { id: string };
+                        Querystring: {
+                            sortRule: 'title' | 'estimate' | todo['status'];
+                        };
                     }>
                 >,
             ],
