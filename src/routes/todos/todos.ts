@@ -14,6 +14,7 @@ export default async function (fastify: FastifyInstance) {
                         Params: { id: string };
                         Querystring: {
                             sortRule: 'title' | 'estimate' | todo['status'];
+                            sortOrder: 'asc' | 'desc';
                         };
                     }>
                 >,

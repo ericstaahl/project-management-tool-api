@@ -15,6 +15,7 @@ type GetTodoRequest = FastifyRequest<{
     Querystring: {
         sortRule: 'title' | 'estimate';
         statusFilter: todo['status'];
+        sortOrder: 'asc' | 'desc';
     };
 }>;
 
@@ -22,6 +23,7 @@ export async function getTodos(request: GetTodoRequest, reply: FastifyReply) {
     const { id: projectId } = request.params;
     const sortRule = request.query['sortRule'];
     const statusFilter = request.query['statusFilter'];
+    const sortOrder = request.query['sortOrder'];
 
     if (
         request.headers.authorization &&
@@ -55,7 +57,7 @@ export async function getTodos(request: GetTodoRequest, reply: FastifyReply) {
                     status: statusFilter,
                 },
                 orderBy: {
-                    [sortRule]: 'asc',
+                    [sortRule]: sortOrder,
                 },
             })
         );
