@@ -1,4 +1,4 @@
-import { AddProject } from '../schemas/project_schema';
+import { AddProject, UpdateProject } from '../schemas/project_schema';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 import { Prisma } from '@prisma/client';
@@ -136,7 +136,7 @@ export async function createProject(
 
 export async function updateProject(
     request: FastifyRequest<{
-        Body: AddProject;
+        Body: UpdateProject;
         Params: { id: string };
     }>,
     reply: FastifyReply
@@ -164,9 +164,8 @@ export async function updateProject(
         );
 
         if (userInfo?.user.user_id) {
-            const dataToSave: Prisma.projectUncheckedCreateWithoutTodoInput = {
+            const dataToSave: Prisma.projectUpdateInput = {
                 ...data,
-                user_id: userInfo.user.user_id,
             };
             return reply.send(
                 await prisma.project.update({

@@ -5,7 +5,7 @@ import {
     createProject,
     updateProject,
 } from '../../controllers/project_controller';
-import { AddProject } from '../../schemas/project_schema';
+import { AddProject, UpdateProject } from '../../schemas/project_schema';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
 export default async function (fastify: FastifyInstance) {
@@ -59,7 +59,7 @@ export default async function (fastify: FastifyInstance) {
             preHandler: [
                 verifyAccessToken<
                     FastifyRequest<{
-                        Body: AddProject;
+                        Body: UpdateProject;
                     }>
                 >,
             ],
