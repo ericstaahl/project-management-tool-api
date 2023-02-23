@@ -3,6 +3,7 @@ import {
     getProjects,
     getProject,
     createProject,
+    updateProject,
 } from '../../controllers/project_controller';
 import { AddProject } from '../../schemas/project_schema';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
@@ -51,5 +52,18 @@ export default async function (fastify: FastifyInstance) {
             ],
         },
         createProject
+    );
+    fastify.post(
+        '/:id',
+        {
+            preHandler: [
+                verifyAccessToken<
+                    FastifyRequest<{
+                        Body: AddProject;
+                    }>
+                >,
+            ],
+        },
+        updateProject
     );
 }

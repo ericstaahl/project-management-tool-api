@@ -133,3 +133,49 @@ export async function createProject(
         }
     }
 }
+
+export async function updateProject(
+    request: FastifyRequest<{
+        Body: AddProject;
+        Params: { id: string };
+    }>,
+    reply: FastifyReply
+) {
+    const data = request.body;
+    const { id: projectId } = request.params;
+
+    console.log('Request:', request);
+    console.log('Reply:', reply);
+
+    if (data.start_date) {
+        data.start_date = new Date(data.start_date).toISOString();
+    }
+
+    if (data.due_date) {
+        data.due_date = new Date(data.due_date).toISOString();
+    }
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        if (userInfo?.user.user_id) {
+            const dataToSave: Prisma.projectUncheckedCreateWithoutTodoInput = {
+                ...data,
+                user_id: userInfo.user.user_id,
+            };
+            return reply.send(
+                await prisma.project.update({
+                    data: dataToSave,
+                    where: {
+                        project_id: Number(projectId),
+                    },
+                })
+            );
+        }
+    }
+}
