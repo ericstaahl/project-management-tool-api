@@ -11,6 +11,10 @@ type GetProjectsRequest = FastifyRequest<{
     };
 }>;
 
+type GetProjectRequest = FastifyRequest<{
+    Params: { id: string };
+}>;
+
 export async function getProjects(
     request: GetProjectsRequest,
     reply: FastifyReply
@@ -45,6 +49,43 @@ export async function getProjects(
                 orderBy: {
                     [sortRule]:
                         sortRule === 'todo' ? { _count: sortOrder } : sortOrder,
+                },
+            })
+        );
+    }
+    return reply.code(401).send({ message: 'No access token provided.' });
+}
+
+export async function getProject(
+    request: GetProjectRequest,
+    reply: FastifyReply
+) {
+    const { id: projectId } = request.params;
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        if (!userInfo?.user.user_id) {
+            return reply
+                .code(401)
+                .send({ message: 'No user id present in token.' });
+        }
+
+        return reply.send(
+            await prisma.project.findFirst({
+                where: {
+                    user_id: userInfo?.user.user_id,
+                    project_id: Number(projectId),
+                },
+                include: {
+                    _count: {
+                        select: { todo: true },
+                    },
                 },
             })
         );

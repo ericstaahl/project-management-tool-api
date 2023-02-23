@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import {
     getProjects,
+    getProject,
     createProject,
 } from '../../controllers/project_controller';
 import { AddProject } from '../../schemas/project_schema';
@@ -24,6 +25,19 @@ export default async function (fastify: FastifyInstance) {
             ],
         },
         getProjects
+    );
+    fastify.get(
+        '/:id',
+        {
+            preHandler: [
+                verifyAccessToken<
+                    FastifyRequest<{
+                        Params: { id: string };
+                    }>
+                >,
+            ],
+        },
+        getProject
     );
     fastify.post(
         '/',
