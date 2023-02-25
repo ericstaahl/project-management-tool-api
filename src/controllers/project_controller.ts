@@ -1,9 +1,13 @@
-import { AddProject, UpdateProject } from '../schemas/project_schema';
+import {
+    AddProjectSchema,
+    UpdateProjectSchema,
+    AddProject,
+    UpdateProject,
+} from '../schemas/project_schema';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 import { Prisma } from '@prisma/client';
 import getUserFromJwt from '../utilities/getUserFromJwt';
-import { z, ZodError } from 'zod';
 
 type GetProjectsRequest = FastifyRequest<{
     Querystring: {
@@ -100,18 +104,14 @@ export async function createProject(
     }>,
     reply: FastifyReply
 ) {
-    const data = request.body;
+    const parsedData = AddProjectSchema.parse(request.body);
 
     console.log('Request:', request);
     console.log('Reply:', reply);
 
-    if (data.start_date) {
-        data.start_date = new Date(data.start_date).toISOString();
-    }
+    parsedData.start_date = new Date(parsedData.start_date).toISOString();
 
-    if (data.due_date) {
-        data.due_date = new Date(data.due_date).toISOString();
-    }
+    parsedData.due_date = new Date(parsedData.due_date).toISOString();
 
     if (
         request.headers.authorization &&
@@ -123,7 +123,7 @@ export async function createProject(
 
         if (userInfo?.user.user_id) {
             const dataToSave: Prisma.projectUncheckedCreateWithoutTodoInput = {
-                ...data,
+                ...parsedData,
                 user_id: userInfo.user.user_id,
             };
             return reply.send(
@@ -142,18 +142,18 @@ export async function updateProject(
     }>,
     reply: FastifyReply
 ) {
-    const data = request.body;
+    const parsedData = UpdateProjectSchema.parse(request.body);
     const { id: projectId } = request.params;
 
     console.log('Request:', request);
     console.log('Reply:', reply);
 
-    if (data.start_date) {
-        data.start_date = new Date(data.start_date).toISOString();
+    if (parsedData.start_date) {
+        parsedData.start_date = new Date(parsedData.start_date).toISOString();
     }
 
-    if (data.due_date) {
-        data.due_date = new Date(data.due_date).toISOString();
+    if (parsedData.due_date) {
+        parsedData.due_date = new Date(parsedData.due_date).toISOString();
     }
 
     if (
@@ -166,7 +166,7 @@ export async function updateProject(
 
         if (userInfo?.user.user_id) {
             const dataToSave: Prisma.projectUpdateInput = {
-                ...data,
+                ...parsedData,
             };
             return reply.send(
                 await prisma.project.updateMany({
