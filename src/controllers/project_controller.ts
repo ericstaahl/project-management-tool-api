@@ -3,6 +3,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 import { Prisma } from '@prisma/client';
 import getUserFromJwt from '../utilities/getUserFromJwt';
+import { z, ZodError } from 'zod';
 
 type GetProjectsRequest = FastifyRequest<{
     Querystring: {
@@ -168,10 +169,40 @@ export async function updateProject(
                 ...data,
             };
             return reply.send(
-                await prisma.project.update({
+                await prisma.project.updateMany({
                     data: dataToSave,
                     where: {
                         project_id: Number(projectId),
+                        user_id: userInfo.user.user_id,
+                    },
+                })
+            );
+        }
+    }
+}
+
+export async function deleteProject(
+    request: FastifyRequest<{
+        Params: { id: string };
+    }>,
+    reply: FastifyReply
+) {
+    const { id: projectId } = request.params;
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        if (userInfo?.user.user_id) {
+            return reply.send(
+                await prisma.project.deleteMany({
+                    where: {
+                        project_id: Number(projectId),
+                        user_id: userInfo.user.user_id,
                     },
                 })
             );

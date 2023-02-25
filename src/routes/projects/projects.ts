@@ -4,6 +4,7 @@ import {
     getProject,
     createProject,
     updateProject,
+    deleteProject,
 } from '../../controllers/project_controller';
 import { AddProject, UpdateProject } from '../../schemas/project_schema';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
@@ -65,5 +66,18 @@ export default async function (fastify: FastifyInstance) {
             ],
         },
         updateProject
+    );
+    fastify.delete(
+        '/:id',
+        {
+            preHandler: [
+                verifyAccessToken<
+                    FastifyRequest<{
+                        Params: { id: string };
+                    }>
+                >,
+            ],
+        },
+        deleteProject
     );
 }
