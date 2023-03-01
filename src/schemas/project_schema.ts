@@ -19,6 +19,12 @@ export const AddProjectSchema = z.object({
         required_error: 'Field is required.',
         invalid_type_error: 'Field should be of type string.',
     }),
+    description: z
+        .string({
+            invalid_type_error: 'Field should be of type string',
+        })
+        .max(500, 'Max 500 characters is allowed.')
+        .optional(),
 });
 
 export type AddProject = z.infer<typeof AddProjectSchema>;
@@ -46,6 +52,12 @@ export const UpdateProjectSchema = z.object({
             required_error: 'Field is required.',
             invalid_type_error: 'Field should be of type string.',
         })
+        .optional(),
+    description: z
+        .string({
+            invalid_type_error: 'Field should be of type string',
+        })
+        .max(500, 'Max 500 characters is allowed.')
         .optional(),
 });
 

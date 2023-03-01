@@ -16,6 +16,7 @@ model project {
   todo              todo[]
   user_id           Int
   user              user     @relation(fields: [user_id], references: [user_id])
+  description       String?  @db.VarChar(500)
 }
 
 enum Status {
