@@ -3,6 +3,7 @@ import prisma from '../prisma';
 import { z, ZodError } from 'zod';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { server } from '../server';
+import getUserFromJwt from '../utilities/getUserFromJwt';
 
 const User = z.object({
     username: z.string().min(5),
@@ -118,4 +119,28 @@ export async function newToken(request: NewTokenRequest, reply: FastifyReply) {
             });
         }
     });
+}
+
+export async function getUsers(request: FastifyRequest, reply: FastifyReply) {
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        if (!userInfo?.user.user_id) {
+            return reply
+                .code(401)
+                .send({ message: 'No user id present in token.' });
+        }
+
+        return reply.send(
+            await prisma.user.findMany({
+                select: { username: true },
+            })
+        );
+    }
+    return reply.code(401).send({ message: 'No access token provided.' });
 }
