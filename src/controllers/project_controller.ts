@@ -78,7 +78,7 @@ export async function getProject(
     request: GetProjectRequest,
     reply: FastifyReply
 ) {
-    const { id: projectId } = request.params;
+    const projectId = Number(request.params.id);
 
     if (
         request.headers.authorization &&
@@ -97,8 +97,20 @@ export async function getProject(
         return reply.send(
             await prisma.project.findFirst({
                 where: {
-                    user_id: userInfo?.user.user_id,
-                    project_id: Number(projectId),
+                    OR: [
+                        {
+                            members: {
+                                every: {
+                                    user_id: { equals: userInfo.user.user_id },
+                                    project_id: { equals: projectId },
+                                },
+                            },
+                        },
+                        {
+                            user_id: userInfo?.user.user_id,
+                            project_id: projectId,
+                        },
+                    ],
                 },
                 include: {
                     _count: {

@@ -20,7 +20,7 @@ type GetTodoRequest = FastifyRequest<{
 }>;
 
 export async function getTodos(request: GetTodoRequest, reply: FastifyReply) {
-    const { id: projectId } = request.params;
+    const projectId = Number(request.params.id);
     const sortRule = request.query['sortRule'];
     const statusFilter = request.query['statusFilter'];
     const sortOrder = request.query['sortOrder'];
@@ -38,8 +38,22 @@ export async function getTodos(request: GetTodoRequest, reply: FastifyReply) {
             try {
                 await prisma.project.findFirstOrThrow({
                     where: {
-                        project_id: Number(projectId),
-                        user_id: userInfo.user.user_id,
+                        OR: [
+                            {
+                                members: {
+                                    every: {
+                                        user_id: {
+                                            equals: userInfo.user.user_id,
+                                        },
+                                        project_id: { equals: projectId },
+                                    },
+                                },
+                            },
+                            {
+                                user_id: userInfo.user.user_id,
+                                project_id: Number(projectId),
+                            },
+                        ],
                     },
                 });
             } catch (err) {
