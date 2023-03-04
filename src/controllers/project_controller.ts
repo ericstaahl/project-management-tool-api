@@ -46,7 +46,18 @@ export async function getProjects(
         return reply.send(
             await prisma.project.findMany({
                 where: {
-                    user_id: userInfo?.user.user_id,
+                    OR: [
+                        {
+                            members: {
+                                every: {
+                                    user_id: { equals: userInfo.user.user_id },
+                                },
+                            },
+                        },
+                        {
+                            user_id: userInfo?.user.user_id,
+                        },
+                    ],
                 },
                 include: {
                     _count: {
