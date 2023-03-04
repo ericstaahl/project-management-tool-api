@@ -5,8 +5,9 @@ import {
     createProject,
     updateProject,
     deleteProject,
+    inviteUser,
 } from '../../controllers/project_controller';
-import { AddProject, UpdateProject } from '../../schemas/project_schema';
+import { AddProject, InviteUser, UpdateProject } from '../../schemas/project_schema';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
 export default async function (fastify: FastifyInstance) {
@@ -79,5 +80,18 @@ export default async function (fastify: FastifyInstance) {
             ],
         },
         deleteProject
+    );
+    fastify.post(
+        '/:id/invite',
+        {
+            preHandler: [
+                verifyAccessToken<
+                    FastifyRequest<{
+                        Body: InviteUser;
+                    }>
+                >,
+            ],
+        },
+        inviteUser
     );
 }

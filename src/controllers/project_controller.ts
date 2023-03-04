@@ -3,6 +3,8 @@ import {
     UpdateProjectSchema,
     AddProject,
     UpdateProject,
+    InviteUserSchema,
+    InviteUser,
 } from '../schemas/project_schema';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
@@ -205,6 +207,35 @@ export async function deleteProject(
                         user_id: userInfo.user.user_id,
                     },
                 })
+            );
+        }
+    }
+}
+
+export async function inviteUser(
+    request: FastifyRequest<{
+        Body: InviteUser;
+        Params: { id: string };
+    }>,
+    reply: FastifyReply
+) {
+
+    const parsedData = InviteUserSchema.parse(request.body)
+    const { id: projectId } = request.params;
+
+    console.log('Request:', request);
+    console.log('Reply:', reply);
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        if (userInfo?.user.user_id) {
+            return reply.send(
             );
         }
     }
