@@ -219,8 +219,7 @@ export async function inviteUser(
     }>,
     reply: FastifyReply
 ) {
-
-    const parsedData = InviteUserSchema.parse(request.body)
+    const parsedData = InviteUserSchema.parse(request.body);
     const { id: projectId } = request.params;
 
     console.log('Request:', request);
@@ -234,9 +233,46 @@ export async function inviteUser(
             request.headers.authorization.split(' ')[1]
         );
 
-        if (userInfo?.user.user_id) {
+        // if (userInfo?.user.user_id) {
+        //     const json = [
+        //         {userId: parsedData.userId, role: "member"},
+        //     ] as Prisma.JsonArray
+        //     return reply.send(
+        //         await prisma.project.update({
+        //             where: {
+        //                 project_id: Number(projectId)
+        //             },
+        //             data: {members: json}
+        //         })
+        //     );
+        // }
+
+        console.log(projectId, parsedData);
+
+        const userToAdd = await prisma.user.findUnique({
+            where: { username: parsedData.username },
+            select: { user_id: true },
+        });
+
+        console.log(userToAdd);
+
+        if (userInfo?.user.user_id && userToAdd !== null) {
             return reply.send(
+                await prisma.project.update({
+                    where: { project_id: Number(projectId) },
+                    data: {
+                        members: { create: { user_id: userToAdd.user_id } },
+                    },
+                })
             );
+            // return reply.send(
+            //     await prisma.users_members.create({
+            //         data: {
+            //             project_id: Number(projectId),
+            //             user_id: Number(parsedData.userId),
+            //         },
+            //     })
+            // );
         }
     }
 }

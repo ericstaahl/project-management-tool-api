@@ -62,14 +62,12 @@ export const UpdateProjectSchema = z.object({
 });
 
 export const InviteUserSchema = z.object({
-    userId: z
-        .string({
-            required_error: 'userId is required.',
-            invalid_type_error: 'userId should be of type string.',
-        })
-    })
+    username: z.string({
+        required_error: 'userId is required.',
+        invalid_type_error: 'userId should be of type string.',
+    }),
+});
 
 export type InviteUser = z.infer<typeof InviteUserSchema>;
-
 
 export type UpdateProject = z.infer<typeof UpdateProjectSchema>;

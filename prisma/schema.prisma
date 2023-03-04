@@ -15,8 +15,13 @@ model project {
   due_date          DateTime @db.Date
   todo              todo[]
   user_id           Int
-  user              user     @relation(fields: [user_id], references: [user_id])
+  user              user     @relation("owner", fields: [user_id], references: [user_id])
   description       String?  @db.VarChar(500)
+
+  // user              user     @relation("owner", fields: [user_id], references: [user_id])
+  // members           Json
+  // users_members     user[]   @relation("member")
+  members users_members[]
 }
 
 enum Status {
@@ -36,8 +41,19 @@ model todo {
 }
 
 model user {
-  user_id  Int       @id @default(autoincrement())
-  username String    @unique
-  password String
-  project  project[]
+  user_id       Int             @id @default(autoincrement())
+  username      String          @unique
+  password      String
+  project       project[]       @relation("owner")
+  // member_in project[] @relation("member")
+  users_members users_members[]
+}
+
+model users_members {
+  id         Int      @id @unique @default(autoincrement())
+  project    project? @relation(fields: [project_id], references: [project_id])
+  user       user?    @relation(fields: [user_id], references: [user_id])
+  user_id    Int
+  project_id Int?
+  role       String?  @default("member")
 }
