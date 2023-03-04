@@ -8,20 +8,16 @@ datasource db {
 }
 
 model project {
-  project_id        Int      @id @default(autoincrement())
-  title             String   @db.VarChar(255)
+  project_id        Int             @id @default(autoincrement())
+  title             String          @db.VarChar(255)
   number_of_members Int?
-  start_date        DateTime @db.Date
-  due_date          DateTime @db.Date
+  start_date        DateTime        @db.Date
+  due_date          DateTime        @db.Date
   todo              todo[]
   user_id           Int
-  user              user     @relation("owner", fields: [user_id], references: [user_id])
-  description       String?  @db.VarChar(500)
-
-  // user              user     @relation("owner", fields: [user_id], references: [user_id])
-  // members           Json
-  // users_members     user[]   @relation("member")
-  members users_members[]
+  user              user            @relation("owner", fields: [user_id], references: [user_id])
+  description       String?         @db.VarChar(500)
+  members           users_members[]
 
   @@unique([project_id, user_id])
 }
@@ -47,7 +43,6 @@ model user {
   username      String          @unique
   password      String
   project       project[]       @relation("owner")
-  // member_in project[] @relation("member")
   users_members users_members[]
 }
 
