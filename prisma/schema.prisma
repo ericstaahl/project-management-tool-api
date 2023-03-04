@@ -22,6 +22,8 @@ model project {
   // members           Json
   // users_members     user[]   @relation("member")
   members users_members[]
+
+  @@unique([project_id, user_id])
 }
 
 enum Status {
@@ -56,4 +58,6 @@ model users_members {
   user_id    Int
   project_id Int?
   role       String?  @default("member")
+
+  @@unique([project_id, user_id])
 }

@@ -259,7 +259,12 @@ export async function inviteUser(
         if (userInfo?.user.user_id && userToAdd !== null) {
             return reply.send(
                 await prisma.project.update({
-                    where: { project_id: Number(projectId) },
+                    where: {
+                        project_id_user_id: {
+                            project_id: Number(projectId),
+                            user_id: userInfo.user.user_id,
+                        },
+                    },
                     data: {
                         members: { create: { user_id: userToAdd.user_id } },
                     },
