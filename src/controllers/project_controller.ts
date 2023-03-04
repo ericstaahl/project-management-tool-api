@@ -233,6 +233,11 @@ export async function inviteUser(
             request.headers.authorization.split(' ')[1]
         );
 
+        if (parsedData.username === userInfo?.user.username) {
+            return reply
+                .code(400)
+                .send({ message: 'Cannot add owner of project.' });
+        }
         const userToAdd = await prisma.user.findUnique({
             where: { username: parsedData.username },
             select: { user_id: true },
