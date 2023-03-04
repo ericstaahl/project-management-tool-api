@@ -233,22 +233,6 @@ export async function inviteUser(
             request.headers.authorization.split(' ')[1]
         );
 
-        // if (userInfo?.user.user_id) {
-        //     const json = [
-        //         {userId: parsedData.userId, role: "member"},
-        //     ] as Prisma.JsonArray
-        //     return reply.send(
-        //         await prisma.project.update({
-        //             where: {
-        //                 project_id: Number(projectId)
-        //             },
-        //             data: {members: json}
-        //         })
-        //     );
-        // }
-
-        console.log(projectId, parsedData);
-
         const userToAdd = await prisma.user.findUnique({
             where: { username: parsedData.username },
             select: { user_id: true },
@@ -270,14 +254,6 @@ export async function inviteUser(
                     },
                 })
             );
-            // return reply.send(
-            //     await prisma.users_members.create({
-            //         data: {
-            //             project_id: Number(projectId),
-            //             user_id: Number(parsedData.userId),
-            //         },
-            //     })
-            // );
         }
     }
 }
