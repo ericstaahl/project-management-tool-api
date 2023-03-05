@@ -36,6 +36,7 @@ model todo {
   project_id  Int
   project     project @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
   status      Status  @default(NOT_STARTED)
+  assignee    String?
 }
 
 model user {

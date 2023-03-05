@@ -25,6 +25,10 @@ type NewTokenRequest = FastifyRequest<{
     };
 }>;
 
+type GetMembersRequest = FastifyRequest<{
+    Params: { id: string };
+}>;
+
 // data: z.infer<typeof User>
 export async function register(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -139,6 +143,41 @@ export async function getUsers(request: FastifyRequest, reply: FastifyReply) {
         return reply.send(
             await prisma.user.findMany({
                 select: { username: true },
+            })
+        );
+    }
+    return reply.code(401).send({ message: 'No access token provided.' });
+}
+
+export async function getMembers(
+    request: GetMembersRequest,
+    reply: FastifyReply
+) {
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        const projectId = Number(request.params.id);
+
+        if (!userInfo?.user.user_id) {
+            return reply
+                .code(401)
+                .send({ message: 'No user id present in token.' });
+        }
+
+        return reply.send(
+            await prisma.user.findMany({
+                where: {
+                    users_members: {
+                        some: {
+                            project_id: { equals: projectId },
+                        },
+                    },
+                },
             })
         );
     }
