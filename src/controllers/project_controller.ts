@@ -49,7 +49,7 @@ export async function getProjects(
                     OR: [
                         {
                             members: {
-                                every: {
+                                some: {
                                     user_id: { equals: userInfo.user.user_id },
                                 },
                             },
@@ -100,7 +100,7 @@ export async function getProject(
                     OR: [
                         {
                             members: {
-                                every: {
+                                some: {
                                     user_id: { equals: userInfo.user.user_id },
                                     project_id: { equals: projectId },
                                 },

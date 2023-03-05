@@ -41,7 +41,7 @@ export async function getTodos(request: GetTodoRequest, reply: FastifyReply) {
                         OR: [
                             {
                                 members: {
-                                    every: {
+                                    some: {
                                         user_id: {
                                             equals: userInfo.user.user_id,
                                         },
