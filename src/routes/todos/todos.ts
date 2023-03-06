@@ -1,7 +1,12 @@
 import { todo } from '@prisma/client';
 import { FastifyInstance, FastifyRequest } from 'fastify';
-import { getTodos, addTodo } from '../../controllers/todo_controller';
-import { AddTodo } from '../../schemas/todo_schema';
+import {
+    getTodos,
+    addTodo,
+    updateTodo,
+    getTodo,
+} from '../../controllers/todo_controller';
+import { AddTodo, UpdateTodo } from '../../schemas/todo_schema';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
 export default async function (fastify: FastifyInstance) {
@@ -23,6 +28,20 @@ export default async function (fastify: FastifyInstance) {
         getTodos
     );
 
+    fastify.get(
+        '/:id/:todoId',
+        {
+            preHandler: [
+                verifyAccessToken<
+                    FastifyRequest<{
+                        Params: { id: string; todoId: string };
+                    }>
+                >,
+            ],
+        },
+        getTodo
+    );
+
     fastify.post(
         '/:id',
         {
@@ -36,5 +55,20 @@ export default async function (fastify: FastifyInstance) {
             ],
         },
         addTodo
+    );
+
+    fastify.put(
+        '/:id/:todoId',
+        {
+            preHandler: [
+                verifyAccessToken<
+                    FastifyRequest<{
+                        Body: UpdateTodo;
+                        Params: { id: string; todoId: string };
+                    }>
+                >,
+            ],
+        },
+        updateTodo
     );
 }
