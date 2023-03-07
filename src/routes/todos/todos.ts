@@ -5,6 +5,7 @@ import {
     addTodo,
     updateTodo,
     getTodo,
+    deleteTodo,
 } from '../../controllers/todo_controller';
 import { AddTodo, UpdateTodo } from '../../schemas/todo_schema';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
@@ -70,5 +71,19 @@ export default async function (fastify: FastifyInstance) {
             ],
         },
         updateTodo
+    );
+
+    fastify.delete(
+        '/:id/:todoId',
+        {
+            preHandler: [
+                verifyAccessToken<
+                    FastifyRequest<{
+                        Params: { id: string; todoId: string };
+                    }>
+                >,
+            ],
+        },
+        deleteTodo
     );
 }

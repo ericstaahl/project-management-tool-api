@@ -228,3 +228,49 @@ export async function updateTodo(
         }
     }
 }
+
+export async function deleteTodo(
+    request: FastifyRequest<{
+        Params: { id: string; todoId: string };
+    }>,
+    reply: FastifyReply
+) {
+    const projectId = Number(request.params.id);
+    const todoId = Number(request.params.todoId);
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        // check if user has access to project
+        if (userInfo?.user.user_id) {
+            try {
+                await prisma.project.findFirstOrThrow({
+                    where: {
+                        project_id: Number(projectId),
+                        user_id: userInfo.user.user_id,
+                    },
+                });
+            } catch (err) {
+                return reply.status(401).send({
+                    message: `You don't have access to this project.`,
+                });
+            }
+        }
+
+        if (userInfo?.user.user_id) {
+            return reply.send(
+                await prisma.todo.deleteMany({
+                    where: {
+                        project_id: projectId,
+                        todo_id: todoId,
+                    },
+                })
+            );
+        }
+    }
+}
