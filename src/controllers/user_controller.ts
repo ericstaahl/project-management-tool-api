@@ -25,7 +25,7 @@ type NewTokenRequest = FastifyRequest<{
     };
 }>;
 
-type GetMembersRequest = FastifyRequest<{
+export type GetMembersRequest = FastifyRequest<{
     Params: { id: string };
 }>;
 

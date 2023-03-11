@@ -5,12 +5,9 @@ import {
     newToken,
     getUsers,
     getMembers,
+    GetMembersRequest,
 } from '../../controllers/user_controller';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
-
-type GetMembersRequest = FastifyRequest<{
-    Params: { id: string };
-}>;
 
 export default async function (fastify: FastifyInstance) {
     fastify.post('/', register);
