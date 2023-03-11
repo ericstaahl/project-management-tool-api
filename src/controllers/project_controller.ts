@@ -11,14 +11,28 @@ import prisma from '../prisma';
 import { Prisma } from '@prisma/client';
 import getUserFromJwt from '../utilities/getUserFromJwt';
 
-type GetProjectsRequest = FastifyRequest<{
+export type GetProjectsRequest = FastifyRequest<{
     Querystring: {
         sortRule: 'due_date' | 'title' | 'todo';
         sortOrder: 'asc' | 'desc';
     };
 }>;
 
-type GetProjectRequest = FastifyRequest<{
+export type ProjectByIdRequest = FastifyRequest<{
+    Params: { id: string };
+}>;
+
+export type AddProjectRequest = FastifyRequest<{
+    Body: AddProject;
+}>;
+
+export type UpdateProjectRequest = FastifyRequest<{
+    Body: UpdateProject;
+    Params: { id: string };
+}>;
+
+export type InviteUserRequest = FastifyRequest<{
+    Body: InviteUser;
     Params: { id: string };
 }>;
 
@@ -75,7 +89,7 @@ export async function getProjects(
 }
 
 export async function getProject(
-    request: GetProjectRequest,
+    request: ProjectByIdRequest,
     reply: FastifyReply
 ) {
     const projectId = Number(request.params.id);
@@ -124,9 +138,7 @@ export async function getProject(
 }
 
 export async function createProject(
-    request: FastifyRequest<{
-        Body: AddProject;
-    }>,
+    request: AddProjectRequest,
     reply: FastifyReply
 ) {
     const parsedData = AddProjectSchema.parse(request.body);
@@ -161,10 +173,7 @@ export async function createProject(
 }
 
 export async function updateProject(
-    request: FastifyRequest<{
-        Body: UpdateProject;
-        Params: { id: string };
-    }>,
+    request: UpdateProjectRequest,
     reply: FastifyReply
 ) {
     const parsedData = UpdateProjectSchema.parse(request.body);
@@ -207,9 +216,7 @@ export async function updateProject(
 }
 
 export async function deleteProject(
-    request: FastifyRequest<{
-        Params: { id: string };
-    }>,
+    request: ProjectByIdRequest,
     reply: FastifyReply
 ) {
     const { id: projectId } = request.params;
@@ -236,10 +243,7 @@ export async function deleteProject(
 }
 
 export async function inviteUser(
-    request: FastifyRequest<{
-        Body: InviteUser;
-        Params: { id: string };
-    }>,
+    request: InviteUserRequest,
     reply: FastifyReply
 ) {
     const parsedData = InviteUserSchema.parse(request.body);

@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest } from 'fastify';
+import { FastifyInstance } from 'fastify';
 import {
     getProjects,
     getProject,
@@ -6,91 +6,54 @@ import {
     updateProject,
     deleteProject,
     inviteUser,
+    GetProjectsRequest,
+    ProjectByIdRequest,
+    AddProjectRequest,
+    InviteUserRequest,
+    UpdateProjectRequest,
 } from '../../controllers/project_controller';
-import { AddProject, InviteUser, UpdateProject } from '../../schemas/project_schema';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
 export default async function (fastify: FastifyInstance) {
     fastify.get(
         '/',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Params: { id: string };
-                        Querystring: {
-                            sortRule: 'due_date' | 'title' | 'todo';
-                            sortOrder: 'asc' | 'desc';
-                            statusFilter: string;
-                        };
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<GetProjectsRequest>],
         },
         getProjects
     );
     fastify.get(
         '/:id',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Params: { id: string };
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<ProjectByIdRequest>],
         },
         getProject
     );
     fastify.post(
         '/',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Body: AddProject;
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<AddProjectRequest>],
         },
         createProject
     );
     fastify.post(
         '/:id',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Body: UpdateProject;
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<UpdateProjectRequest>],
         },
         updateProject
     );
     fastify.delete(
         '/:id',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Params: { id: string };
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<ProjectByIdRequest>],
         },
         deleteProject
     );
     fastify.post(
         '/:id/invite',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Body: InviteUser;
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<InviteUserRequest>],
         },
         inviteUser
     );
