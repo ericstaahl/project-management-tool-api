@@ -61,7 +61,7 @@ export async function getProjects(
                 },
                 include: {
                     _count: {
-                        select: { todo: true },
+                        select: { todo: true, members: true },
                     },
                 },
                 orderBy: {
@@ -114,7 +114,7 @@ export async function getProject(
                 },
                 include: {
                     _count: {
-                        select: { todo: true },
+                        select: { todo: true, members: true },
                     },
                 },
             })
