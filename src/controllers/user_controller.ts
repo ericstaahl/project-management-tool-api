@@ -15,21 +15,6 @@ const LoginSchema = z.object({
     password: z.string(),
 });
 
-type LoginRequest = FastifyRequest<{
-    Body: z.infer<typeof LoginSchema>;
-}>;
-
-type NewTokenRequest = FastifyRequest<{
-    Body: {
-        token: string;
-    };
-}>;
-
-export type GetMembersRequest = FastifyRequest<{
-    Params: { id: string };
-}>;
-
-// data: z.infer<typeof User>
 export async function register(request: FastifyRequest, reply: FastifyReply) {
     try {
         const parsedData = User.parse(request.body);
@@ -183,3 +168,17 @@ export async function getMembers(
     }
     return reply.code(401).send({ message: 'No access token provided.' });
 }
+
+type LoginRequest = FastifyRequest<{
+    Body: z.infer<typeof LoginSchema>;
+}>;
+
+type NewTokenRequest = FastifyRequest<{
+    Body: {
+        token: string;
+    };
+}>;
+
+export type GetMembersRequest = FastifyRequest<{
+    Params: { id: string };
+}>;

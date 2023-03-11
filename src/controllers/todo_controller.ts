@@ -10,33 +10,6 @@ import { FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 import getUserFromJwt from '../utilities/getUserFromJwt';
 
-export type AddTodoRequst = FastifyRequest<{
-    Body: AddTodo;
-    Params: { id: string };
-}>;
-
-export type GetTodosRequest = FastifyRequest<{
-    Params: { id: string };
-    Querystring: {
-        sortRule: 'title' | 'estimate';
-        statusFilter: todo['status'];
-        sortOrder: 'asc' | 'desc';
-    };
-}>;
-
-export type GetTodoRequest = FastifyRequest<{
-    Params: { id: string; todoId: string };
-}>;
-
-export type UpdateTodoRequest = FastifyRequest<{
-    Body: UpdateTodo;
-    Params: { id: string; todoId: string };
-}>;
-
-export type DeleteTodoRequest = FastifyRequest<{
-    Params: { id: string; todoId: string };
-}>;
-
 export async function getTodos(request: GetTodosRequest, reply: FastifyReply) {
     const projectId = Number(request.params.id);
     const sortRule = request.query['sortRule'];
@@ -278,3 +251,30 @@ export async function deleteTodo(
         }
     }
 }
+
+export type AddTodoRequst = FastifyRequest<{
+    Body: AddTodo;
+    Params: { id: string };
+}>;
+
+export type GetTodosRequest = FastifyRequest<{
+    Params: { id: string };
+    Querystring: {
+        sortRule: 'title' | 'estimate';
+        statusFilter: todo['status'];
+        sortOrder: 'asc' | 'desc';
+    };
+}>;
+
+export type GetTodoRequest = FastifyRequest<{
+    Params: { id: string; todoId: string };
+}>;
+
+export type UpdateTodoRequest = FastifyRequest<{
+    Body: UpdateTodo;
+    Params: { id: string; todoId: string };
+}>;
+
+export type DeleteTodoRequest = FastifyRequest<{
+    Params: { id: string; todoId: string };
+}>;

@@ -11,31 +11,6 @@ import prisma from '../prisma';
 import { Prisma } from '@prisma/client';
 import getUserFromJwt from '../utilities/getUserFromJwt';
 
-export type GetProjectsRequest = FastifyRequest<{
-    Querystring: {
-        sortRule: 'due_date' | 'title' | 'todo';
-        sortOrder: 'asc' | 'desc';
-    };
-}>;
-
-export type ProjectByIdRequest = FastifyRequest<{
-    Params: { id: string };
-}>;
-
-export type AddProjectRequest = FastifyRequest<{
-    Body: AddProject;
-}>;
-
-export type UpdateProjectRequest = FastifyRequest<{
-    Body: UpdateProject;
-    Params: { id: string };
-}>;
-
-export type InviteUserRequest = FastifyRequest<{
-    Body: InviteUser;
-    Params: { id: string };
-}>;
-
 export async function getProjects(
     request: GetProjectsRequest,
     reply: FastifyReply
@@ -289,3 +264,28 @@ export async function inviteUser(
         }
     }
 }
+
+export type GetProjectsRequest = FastifyRequest<{
+    Querystring: {
+        sortRule: 'due_date' | 'title' | 'todo';
+        sortOrder: 'asc' | 'desc';
+    };
+}>;
+
+export type ProjectByIdRequest = FastifyRequest<{
+    Params: { id: string };
+}>;
+
+export type AddProjectRequest = FastifyRequest<{
+    Body: AddProject;
+}>;
+
+export type UpdateProjectRequest = FastifyRequest<{
+    Body: UpdateProject;
+    Params: { id: string };
+}>;
+
+export type InviteUserRequest = FastifyRequest<{
+    Body: InviteUser;
+    Params: { id: string };
+}>;
