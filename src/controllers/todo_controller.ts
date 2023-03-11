@@ -10,12 +10,12 @@ import { FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 import getUserFromJwt from '../utilities/getUserFromJwt';
 
-type AddTodoRequst = FastifyRequest<{
+export type AddTodoRequst = FastifyRequest<{
     Body: AddTodo;
     Params: { id: string };
 }>;
 
-type GetTodosRequest = FastifyRequest<{
+export type GetTodosRequest = FastifyRequest<{
     Params: { id: string };
     Querystring: {
         sortRule: 'title' | 'estimate';
@@ -24,7 +24,16 @@ type GetTodosRequest = FastifyRequest<{
     };
 }>;
 
-type GetTodoRequest = FastifyRequest<{
+export type GetTodoRequest = FastifyRequest<{
+    Params: { id: string; todoId: string };
+}>;
+
+export type UpdateTodoRequest = FastifyRequest<{
+    Body: UpdateTodo;
+    Params: { id: string; todoId: string };
+}>;
+
+export type DeleteTodoRequest = FastifyRequest<{
     Params: { id: string; todoId: string };
 }>;
 
@@ -180,10 +189,7 @@ export async function addTodo(request: AddTodoRequst, reply: FastifyReply) {
 }
 
 export async function updateTodo(
-    request: FastifyRequest<{
-        Body: UpdateTodo;
-        Params: { id: string; todoId: string };
-    }>,
+    request: UpdateTodoRequest,
     reply: FastifyReply
 ) {
     const parsedData = UpdateTodoSchema.parse(request.body);
@@ -230,9 +236,7 @@ export async function updateTodo(
 }
 
 export async function deleteTodo(
-    request: FastifyRequest<{
-        Params: { id: string; todoId: string };
-    }>,
+    request: DeleteTodoRequest,
     reply: FastifyReply
 ) {
     const projectId = Number(request.params.id);

@@ -6,6 +6,11 @@ import {
     updateTodo,
     getTodo,
     deleteTodo,
+    GetTodoRequest,
+    AddTodoRequst,
+    DeleteTodoRequest,
+    GetTodosRequest,
+    UpdateTodoRequest,
 } from '../../controllers/todo_controller';
 import { AddTodo, UpdateTodo } from '../../schemas/todo_schema';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
@@ -14,17 +19,7 @@ export default async function (fastify: FastifyInstance) {
     fastify.get(
         '/:id',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Params: { id: string };
-                        Querystring: {
-                            sortRule: 'title' | 'estimate' | todo['status'];
-                            sortOrder: 'asc' | 'desc';
-                        };
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<GetTodosRequest>],
         },
         getTodos
     );
@@ -32,13 +27,7 @@ export default async function (fastify: FastifyInstance) {
     fastify.get(
         '/:id/:todoId',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Params: { id: string; todoId: string };
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<GetTodoRequest>],
         },
         getTodo
     );
@@ -46,14 +35,7 @@ export default async function (fastify: FastifyInstance) {
     fastify.post(
         '/:id',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Body: AddTodo;
-                        Params: { id: string };
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<AddTodoRequst>],
         },
         addTodo
     );
@@ -61,14 +43,7 @@ export default async function (fastify: FastifyInstance) {
     fastify.put(
         '/:id/:todoId',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Body: UpdateTodo;
-                        Params: { id: string; todoId: string };
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<UpdateTodoRequest>],
         },
         updateTodo
     );
@@ -76,13 +51,7 @@ export default async function (fastify: FastifyInstance) {
     fastify.delete(
         '/:id/:todoId',
         {
-            preHandler: [
-                verifyAccessToken<
-                    FastifyRequest<{
-                        Params: { id: string; todoId: string };
-                    }>
-                >,
-            ],
+            preHandler: [verifyAccessToken<DeleteTodoRequest>],
         },
         deleteTodo
     );
