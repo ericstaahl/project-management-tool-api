@@ -1,4 +1,3 @@
-import { todo } from '@prisma/client';
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import {
     getTodos,
@@ -12,7 +11,6 @@ import {
     GetTodosRequest,
     UpdateTodoRequest,
 } from '../../controllers/todo_controller';
-import { AddTodo, UpdateTodo } from '../../schemas/todo_schema';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
 export default async function (fastify: FastifyInstance) {
