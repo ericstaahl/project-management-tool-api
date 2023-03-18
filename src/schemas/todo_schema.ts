@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+const statuses = ['NOT_STARTED', 'IN_PROGRESS', 'DONE'] as const;
+
 export const AddTodoSchema = z.object({
     title: z.string({
         required_error: 'Field is required.',
@@ -46,6 +48,12 @@ export const UpdateTodoSchema = z.object({
     assignee: z
         .string({
             invalid_type_error: 'Field should be of type string.',
+        })
+        .nullable()
+        .optional(),
+    status: z
+        .enum(statuses, {
+            invalid_type_error: `Field should have the one of the following values: ${statuses.toString()}`,
         })
         .optional(),
 });
