@@ -7,6 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  NOT_STARTED
+  IN_PROGRESS
+  DONE
+}
+
+enum ProjectStatus {
+  IN_PROGRESS
+  DONE
+}
+
 model project {
   project_id        Int             @id @default(autoincrement())
   title             String          @db.VarChar(255)
@@ -18,14 +29,9 @@ model project {
   user              user            @relation("owner", fields: [user_id], references: [user_id])
   description       String?         @db.VarChar(500)
   members           users_members[]
+  finished          Boolean         @default(false)
 
   @@unique([project_id, user_id])
-}
-
-enum Status {
-  NOT_STARTED
-  IN_PROGRESS
-  DONE
 }
 
 model todo {
