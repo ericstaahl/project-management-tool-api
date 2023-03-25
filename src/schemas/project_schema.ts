@@ -5,12 +5,6 @@ export const AddProjectSchema = z.object({
         required_error: 'Field is required.',
         invalid_type_error: 'Field should be of type string.',
     }),
-    number_of_members: z
-        .number({
-            invalid_type_error: 'Field should be of type number.',
-        })
-        .optional(),
-
     start_date: z.string({
         required_error: 'Field is required.',
         invalid_type_error: 'Field should be of type string.',
@@ -36,11 +30,6 @@ export const UpdateProjectSchema = z.object({
             invalid_type_error: 'Field should be of type string.',
         })
         .optional(),
-    number_of_members: z
-        .number({
-            invalid_type_error: 'Field should be of type number.',
-        })
-        .optional(),
     start_date: z
         .string({
             required_error: 'Field is required.',
@@ -58,6 +47,11 @@ export const UpdateProjectSchema = z.object({
             invalid_type_error: 'Field should be of type string',
         })
         .max(500, 'Max 500 characters is allowed.')
+        .optional(),
+    complete: z
+        .boolean({
+            invalid_type_error: 'Field should be of type boolean',
+        })
         .optional(),
 });
 
