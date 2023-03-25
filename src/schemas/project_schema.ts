@@ -1,26 +1,33 @@
 import dayjs from 'dayjs';
 import { z } from 'zod';
 
-export const AddProjectSchema = z.object({
-    title: z.string({
-        required_error: 'Field is required.',
-        invalid_type_error: 'Field should be of type string.',
-    }),
-    start_date: z.coerce.date({
-        invalid_type_error: 'Field should be formatted as a valid date',
-    }),
-    due_date: z.coerce
-        .date({
+export const AddProjectSchema = z
+    .object({
+        title: z.string({
+            required_error: 'Field is required.',
+            invalid_type_error: 'Field should be of type string.',
+        }),
+        start_date: z.coerce.date({
             invalid_type_error: 'Field should be formatted as a valid date',
-        })
-        .min(dayjs().toDate()),
-    description: z
-        .string({
-            invalid_type_error: 'Field should be of type string',
-        })
-        .max(500, 'Max 500 characters is allowed.')
-        .optional(),
-});
+        }),
+        due_date: z.coerce.date({
+            invalid_type_error: 'Field should be formatted as a valid date',
+        }),
+        description: z
+            .string({
+                invalid_type_error: 'Field should be of type string',
+            })
+            .max(500, 'Max 500 characters is allowed.')
+            .optional(),
+    })
+    .refine(
+        (schema) => {
+            return dayjs(schema.due_date).diff(schema.start_date) >= 0
+                ? true
+                : false;
+        },
+        { message: 'Due date cannot be before start date.' }
+    );
 
 export type AddProject = z.infer<typeof AddProjectSchema>;
 
