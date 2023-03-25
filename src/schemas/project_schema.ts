@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { z } from 'zod';
 
 export const AddProjectSchema = z.object({
@@ -5,14 +6,14 @@ export const AddProjectSchema = z.object({
         required_error: 'Field is required.',
         invalid_type_error: 'Field should be of type string.',
     }),
-    start_date: z.string({
-        required_error: 'Field is required.',
-        invalid_type_error: 'Field should be of type string.',
+    start_date: z.coerce.date({
+        invalid_type_error: 'Field should be formatted as a valid date',
     }),
-    due_date: z.string({
-        required_error: 'Field is required.',
-        invalid_type_error: 'Field should be of type string.',
-    }),
+    due_date: z.coerce
+        .date({
+            invalid_type_error: 'Field should be formatted as a valid date',
+        })
+        .min(dayjs().toDate()),
     description: z
         .string({
             invalid_type_error: 'Field should be of type string',
@@ -30,17 +31,16 @@ export const UpdateProjectSchema = z.object({
             invalid_type_error: 'Field should be of type string.',
         })
         .optional(),
-    start_date: z
-        .string({
-            required_error: 'Field is required.',
-            invalid_type_error: 'Field should be of type string.',
+    start_date: z.coerce
+        .date({
+            invalid_type_error: 'Field should be formatted as a valid date',
         })
         .optional(),
-    due_date: z
-        .string({
-            required_error: 'Field is required.',
-            invalid_type_error: 'Field should be of type string.',
+    due_date: z.coerce
+        .date({
+            invalid_type_error: 'Field should be formatted as a valid date',
         })
+        .min(dayjs().toDate())
         .optional(),
     description: z
         .string({

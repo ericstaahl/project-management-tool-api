@@ -121,9 +121,9 @@ export async function createProject(
     console.log('Request:', request);
     console.log('Reply:', reply);
 
-    parsedData.start_date = new Date(parsedData.start_date).toISOString();
+    // parsedData.start_date = new Date(parsedData.start_date).toISOString();
 
-    parsedData.due_date = new Date(parsedData.due_date).toISOString();
+    // parsedData.due_date = new Date(parsedData.due_date).toISOString();
 
     if (
         request.headers.authorization &&
@@ -157,13 +157,13 @@ export async function updateProject(
     console.log('Request:', request);
     console.log('Reply:', reply);
 
-    if (parsedData.start_date) {
-        parsedData.start_date = new Date(parsedData.start_date).toISOString();
-    }
+    // if (parsedData.start_date) {
+    //     parsedData.start_date = new Date(parsedData.start_date).toISOString();
+    // }
 
-    if (parsedData.due_date) {
-        parsedData.due_date = new Date(parsedData.due_date).toISOString();
-    }
+    // if (parsedData.due_date) {
+    //     parsedData.due_date = new Date(parsedData.due_date).toISOString();
+    // }
 
     if (
         request.headers.authorization &&
