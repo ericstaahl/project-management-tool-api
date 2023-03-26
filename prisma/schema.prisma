@@ -50,13 +50,16 @@ model user {
   password      String
   project       project[]       @relation("owner")
   users_members users_members[]
+
+  @@unique([user_id, username])
 }
 
 model users_members {
   id         Int      @id @unique @default(autoincrement())
   project    project? @relation(fields: [project_id], references: [project_id])
-  user       user?    @relation(fields: [user_id], references: [user_id])
+  user       user?    @relation(fields: [user_id, username], references: [user_id, username])
   user_id    Int
+  username   String
   project_id Int?
   role       String?  @default("member")
 
