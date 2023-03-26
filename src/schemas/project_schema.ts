@@ -45,7 +45,6 @@ export const UpdateProjectSchema = z
             .date({
                 invalid_type_error: 'Field should be formatted as a valid date',
             })
-            .min(dayjs().toDate())
             .optional(),
         description: z
             .string({
