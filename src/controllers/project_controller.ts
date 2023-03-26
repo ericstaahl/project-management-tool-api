@@ -52,6 +52,7 @@ export async function getProjects(
                     _count: {
                         select: { todo: true, members: true },
                     },
+                    members: true,
                 },
                 orderBy: {
                     [sortRule]:
@@ -105,6 +106,7 @@ export async function getProject(
                     _count: {
                         select: { todo: true, members: true },
                     },
+                    members: true,
                 },
             })
         );
@@ -257,7 +259,12 @@ export async function inviteUser(
                         },
                     },
                     data: {
-                        members: { create: { user_id: userToAdd.user_id } },
+                        members: {
+                            create: {
+                                user_id: userToAdd.user_id,
+                                username: parsedData.username,
+                            },
+                        },
                     },
                 })
             );
