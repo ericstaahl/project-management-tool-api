@@ -21,46 +21,63 @@ export const AddProjectSchema = z
             .optional(),
     })
     .refine(
-        (schema) => {
-            return dayjs(schema.due_date).diff(schema.start_date) >= 0
-                ? true
-                : false;
+        (val) => {
+            return dayjs(val.due_date).diff(val.start_date) >= 0 ? true : false;
         },
         { message: 'Due date cannot be before start date.' }
     );
 
 export type AddProject = z.infer<typeof AddProjectSchema>;
 
-export const UpdateProjectSchema = z.object({
-    title: z
-        .string({
-            required_error: 'Field is required.',
-            invalid_type_error: 'Field should be of type string.',
-        })
-        .optional(),
-    start_date: z.coerce
-        .date({
-            invalid_type_error: 'Field should be formatted as a valid date',
-        })
-        .optional(),
-    due_date: z.coerce
-        .date({
-            invalid_type_error: 'Field should be formatted as a valid date',
-        })
-        .min(dayjs().toDate())
-        .optional(),
-    description: z
-        .string({
-            invalid_type_error: 'Field should be of type string',
-        })
-        .max(500, 'Max 500 characters is allowed.')
-        .optional(),
-    complete: z
-        .boolean({
-            invalid_type_error: 'Field should be of type boolean',
-        })
-        .optional(),
-});
+export const UpdateProjectSchema = z
+    .object({
+        title: z
+            .string({
+                invalid_type_error: 'Field should be of type string.',
+            })
+            .optional(),
+        start_date: z.coerce
+            .date({
+                invalid_type_error: 'Field should be formatted as a valid date',
+            })
+            .optional(),
+        due_date: z.coerce
+            .date({
+                invalid_type_error: 'Field should be formatted as a valid date',
+            })
+            .min(dayjs().toDate())
+            .optional(),
+        description: z
+            .string({
+                invalid_type_error: 'Field should be of type string',
+            })
+            .max(500, 'Max 500 characters is allowed.')
+            .optional(),
+        complete: z
+            .boolean({
+                invalid_type_error: 'Field should be of type boolean',
+            })
+            .optional(),
+    })
+
+    .superRefine((val, ctx) => {
+        if (!val.start_date && !val.due_date) return;
+        if (!val.start_date || !val.due_date) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                    'Both start date and due date must be present at the same time when updating either of them.',
+                fatal: true,
+            });
+            return z.NEVER;
+        }
+        return dayjs(val.due_date).diff(val.start_date) >= 0
+            ? true
+            : ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  message: 'Due date cannot be before start date.',
+              });
+    });
 
 export const InviteUserSchema = z.object({
     username: z.string({
