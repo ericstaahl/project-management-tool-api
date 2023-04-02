@@ -25,6 +25,7 @@ export const AddTodoSchema = z.object({
         .string({
             invalid_type_error: 'Field should be of type string.',
         })
+        .nullable()
         .optional(),
 });
 
