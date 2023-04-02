@@ -3,10 +3,13 @@ import { z } from 'zod';
 const statuses = ['NOT_STARTED', 'IN_PROGRESS', 'DONE'] as const;
 
 export const AddTodoSchema = z.object({
-    title: z.string({
-        required_error: 'Field is required.',
-        invalid_type_error: 'Field should be of type string.',
-    }),
+    title: z
+        .string({
+            required_error: 'Field is required.',
+            invalid_type_error: 'Field should be of type string.',
+        })
+        .min(3, 'Min. 3 characters')
+        .max(20, 'Max 20 characters'),
     estimate: z.string({
         required_error: 'Field is required.',
         invalid_type_error: 'Field should be of type string.',
@@ -31,6 +34,8 @@ export const UpdateTodoSchema = z.object({
             required_error: 'Field is required.',
             invalid_type_error: 'Field should be of type string.',
         })
+        .min(3, 'Min. 3 characters')
+        .max(20, 'Max 20 characters')
         .optional(),
     estimate: z
         .string({

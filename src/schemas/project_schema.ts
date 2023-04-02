@@ -3,10 +3,13 @@ import { z } from 'zod';
 
 export const AddProjectSchema = z
     .object({
-        title: z.string({
-            required_error: 'Field is required.',
-            invalid_type_error: 'Field should be of type string.',
-        }),
+        title: z
+            .string({
+                required_error: 'Field is required.',
+                invalid_type_error: 'Field should be of type string.',
+            })
+            .min(3, 'Min. 3 characters')
+            .max(20, 'Max 20 characters'),
         start_date: z.coerce.date({
             invalid_type_error: 'Field should be formatted as a valid date',
         }),
@@ -35,6 +38,8 @@ export const UpdateProjectSchema = z
             .string({
                 invalid_type_error: 'Field should be of type string.',
             })
+            .min(3, 'Min. 3 characters')
+            .max(20, 'Max 20 characters')
             .optional(),
         start_date: z.coerce
             .date({
