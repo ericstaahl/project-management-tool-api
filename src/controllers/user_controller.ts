@@ -5,6 +5,7 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { server } from '../server';
 import getUserFromJwt from '../utilities/getUserFromJwt';
 import { LoginType, User } from '../schemas/user_schema';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export async function register(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -20,6 +21,7 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
                     'An error occured when attempting to hash provided password',
             });
         }
+
         await prisma.user.create({
             data: userToSave,
         });
@@ -29,7 +31,19 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
     } catch (error) {
         if (error instanceof ZodError) {
             return reply.code(400).send({ errors: error.flatten() });
+        } else if (
+            error instanceof PrismaClientKnownRequestError &&
+            error.code === 'P2002'
+        ) {
+            return reply
+                .code(409)
+                .send({ message: 'Username is already taken.' });
         } else {
+            console.log('special error:', error);
+            console.log(
+                'instanceof:',
+                error instanceof PrismaClientKnownRequestError
+            );
             return reply.code(500).send();
         }
     }
