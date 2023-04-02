@@ -1,19 +1,10 @@
 import bcrypt from 'bcrypt';
 import prisma from '../prisma';
-import { z, ZodError } from 'zod';
+import { ZodError } from 'zod';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { server } from '../server';
 import getUserFromJwt from '../utilities/getUserFromJwt';
-
-const User = z.object({
-    username: z.string().min(5),
-    password: z.string().min(8),
-});
-
-const LoginSchema = z.object({
-    username: z.string(),
-    password: z.string(),
-});
+import { LoginType, User } from '../schemas/user_schema';
 
 export async function register(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -170,7 +161,7 @@ export async function getMembers(
 }
 
 type LoginRequest = FastifyRequest<{
-    Body: z.infer<typeof LoginSchema>;
+    Body: LoginType;
 }>;
 
 type NewTokenRequest = FastifyRequest<{
