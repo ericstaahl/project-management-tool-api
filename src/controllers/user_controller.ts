@@ -161,6 +161,7 @@ export async function getMembers(
 
         return reply.send(
             await prisma.user.findMany({
+                select: { user_id: true, username: true },
                 where: {
                     users_members: {
                         some: {
