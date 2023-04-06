@@ -11,6 +11,8 @@ import {
     AddProjectRequest,
     InviteUserRequest,
     UpdateProjectRequest,
+    addProjectComment,
+    AddProjectCommentRequest,
 } from '../../controllers/project_controller';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
@@ -56,5 +58,12 @@ export default async function (fastify: FastifyInstance) {
             preHandler: [verifyAccessToken<InviteUserRequest>],
         },
         inviteUser
+    );
+    fastify.post(
+        '/:id/comment',
+        {
+            preHandler: [verifyAccessToken<AddProjectCommentRequest>],
+        },
+        addProjectComment
     );
 }

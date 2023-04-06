@@ -19,16 +19,17 @@ enum ProjectStatus {
 }
 
 model project {
-  project_id  Int             @id @default(autoincrement())
-  title       String          @db.VarChar(255)
-  start_date  DateTime        @db.Date
-  due_date    DateTime        @db.Date
-  todo        todo[]
-  user_id     Int
-  user        user            @relation("owner", fields: [user_id], references: [user_id])
-  description String?         @db.VarChar(500)
-  members     users_members[]
-  complete    Boolean         @default(false)
+  project_id      Int               @id @default(autoincrement())
+  title           String            @db.VarChar(255)
+  start_date      DateTime          @db.Date
+  due_date        DateTime          @db.Date
+  todo            todo[]
+  user_id         Int
+  user            user              @relation("owner", fields: [user_id], references: [user_id])
+  description     String?           @db.VarChar(500)
+  members         users_members[]
+  complete        Boolean           @default(false)
+  project_comment project_comment[]
 
   @@unique([project_id, user_id])
 }
@@ -45,11 +46,12 @@ model todo {
 }
 
 model user {
-  user_id       Int             @id @default(autoincrement())
-  username      String          @unique
-  password      String
-  project       project[]       @relation("owner")
-  users_members users_members[]
+  user_id         Int               @id @default(autoincrement())
+  username        String            @unique
+  password        String
+  project         project[]         @relation("owner")
+  users_members   users_members[]
+  project_comment project_comment[]
 
   @@unique([user_id, username])
 }
@@ -64,4 +66,16 @@ model users_members {
   role       String?  @default("member")
 
   @@unique([project_id, user_id])
+}
+
+model project_comment {
+  comment_id      Int               @id @unique @default(autoincrement())
+  project         project?          @relation(fields: [project_id], references: [project_id])
+  user            user?             @relation(fields: [user_id], references: [user_id])
+  user_id         Int
+  project_id      Int
+  content         String
+  reply_to_id     Int?
+  reply           project_comment?  @relation("CommentReply", fields: [reply_to_id], references: [comment_id])
+  project_comment project_comment[] @relation("CommentReply")
 }

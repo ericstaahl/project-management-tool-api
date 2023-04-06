@@ -5,6 +5,8 @@ import {
     UpdateProject,
     InviteUserSchema,
     InviteUser,
+    AddProjectComment,
+    AddProjectCommentSchema,
 } from '../schemas/project_schema';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
@@ -272,6 +274,39 @@ export async function inviteUser(
     }
 }
 
+export async function addProjectComment(
+    request: AddProjectCommentRequest,
+    reply: FastifyReply
+) {
+    const projectId = Number(request.params.id);
+    const parsedData = AddProjectCommentSchema.parse(request.body);
+
+    console.log('Request:', request);
+    console.log('Reply:', reply);
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        if (userInfo?.user.user_id) {
+            const dataToSave: Prisma.project_commentUncheckedCreateInput = {
+                ...parsedData,
+                project_id: projectId,
+                user_id: userInfo.user.user_id,
+            };
+            return reply.send(
+                await prisma.project_comment.create({
+                    data: dataToSave,
+                })
+            );
+        }
+    }
+}
+
 export type GetProjectsRequest = FastifyRequest<{
     Querystring: {
         sortRule: 'due_date' | 'title' | 'todo';
@@ -294,5 +329,10 @@ export type UpdateProjectRequest = FastifyRequest<{
 
 export type InviteUserRequest = FastifyRequest<{
     Body: InviteUser;
+    Params: { id: string };
+}>;
+
+export type AddProjectCommentRequest = FastifyRequest<{
+    Body: AddProjectComment;
     Params: { id: string };
 }>;
