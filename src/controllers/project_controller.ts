@@ -12,6 +12,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 import { Prisma } from '@prisma/client';
 import getUserFromJwt from '../utilities/getUserFromJwt';
+import checkUserAccess from '../utilities/checkUserAccess';
 
 export async function getProjects(
     request: GetProjectsRequest,
@@ -107,6 +108,13 @@ export async function getProject(
                 include: {
                     _count: {
                         select: { todo: true, members: true },
+                    },
+                    project_comment: {
+                        include: {
+                            user: {
+                                select: { username: true },
+                            },
+                        },
                     },
                     members: true,
                 },
@@ -291,6 +299,21 @@ export async function addProjectComment(
         const userInfo = getUserFromJwt(
             request.headers.authorization.split(' ')[1]
         );
+
+        // check if user has access to project
+        if (userInfo?.user.user_id) {
+            try {
+                await checkUserAccess(userInfo.user.user_id, projectId);
+            } catch (err) {
+                reply.status(401).send({
+                    message: `You don't have access to this project.`,
+                });
+                throw err;
+            }
+        } else
+            reply.status(401).send({
+                message: `You don't have access to this project.`,
+            });
 
         if (userInfo?.user.user_id) {
             const dataToSave: Prisma.project_commentUncheckedCreateInput = {
