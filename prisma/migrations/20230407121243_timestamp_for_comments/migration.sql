@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `project_comment` ADD COLUMN `time_posted` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
