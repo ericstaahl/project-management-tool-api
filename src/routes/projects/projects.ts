@@ -13,6 +13,8 @@ import {
     UpdateProjectRequest,
     addProjectComment,
     AddProjectCommentRequest,
+    deleteProjectComment,
+    DeleteCommentRequest,
 } from '../../controllers/project_controller';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
@@ -65,5 +67,12 @@ export default async function (fastify: FastifyInstance) {
             preHandler: [verifyAccessToken<AddProjectCommentRequest>],
         },
         addProjectComment
+    );
+    fastify.delete(
+        '/comment/:id',
+        {
+            preHandler: [verifyAccessToken<DeleteCommentRequest>],
+        },
+        deleteProjectComment
     );
 }

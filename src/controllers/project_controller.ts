@@ -330,6 +330,33 @@ export async function addProjectComment(
     }
 }
 
+export async function deleteProjectComment(
+    request: DeleteCommentRequest,
+    reply: FastifyReply
+) {
+    const { id: commentId } = request.params;
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        if (userInfo?.user.user_id) {
+            return reply.send(
+                await prisma.project_comment.deleteMany({
+                    where: {
+                        comment_id: Number(commentId),
+                        user_id: userInfo.user.user_id,
+                    },
+                })
+            );
+        }
+    }
+}
+
 export type GetProjectsRequest = FastifyRequest<{
     Querystring: {
         sortRule: 'due_date' | 'title' | 'todo';
@@ -357,5 +384,9 @@ export type InviteUserRequest = FastifyRequest<{
 
 export type AddProjectCommentRequest = FastifyRequest<{
     Body: AddProjectComment;
+    Params: { id: string };
+}>;
+
+export type DeleteCommentRequest = FastifyRequest<{
     Params: { id: string };
 }>;
