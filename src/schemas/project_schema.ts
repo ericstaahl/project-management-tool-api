@@ -98,11 +98,6 @@ export const AddProjectCommentSchema = z.object({
         })
         .min(10, 'Min. 10 characters')
         .max(200, 'Max 200 characters'),
-    reply_to_id: z
-        .number({
-            invalid_type_error: 'Field should be of type number.',
-        })
-        .optional(),
 });
 
 export type AddProjectComment = z.infer<typeof AddProjectCommentSchema>;
