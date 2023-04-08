@@ -10,6 +10,10 @@ import {
     DeleteTodoRequest,
     GetTodosRequest,
     UpdateTodoRequest,
+    addTodoComment,
+    AddTodoCommentRequest,
+    DeleteCommentRequest,
+    deleteTodoComment,
 } from '../../controllers/todo_controller';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
@@ -52,5 +56,19 @@ export default async function (fastify: FastifyInstance) {
             preHandler: [verifyAccessToken<DeleteTodoRequest>],
         },
         deleteTodo
+    );
+    fastify.post(
+        '/:todoId/comment',
+        {
+            preHandler: [verifyAccessToken<AddTodoCommentRequest>],
+        },
+        addTodoComment
+    );
+    fastify.delete(
+        '/comment/:id',
+        {
+            preHandler: [verifyAccessToken<DeleteCommentRequest>],
+        },
+        deleteTodoComment
     );
 }

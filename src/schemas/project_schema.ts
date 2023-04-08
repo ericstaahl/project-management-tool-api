@@ -105,7 +105,7 @@ export const AddProjectCommentSchema = z.object({
         .optional(),
 });
 
-export type AddProjectComment = z.infer<typeof AddProjectSchema>;
+export type AddProjectComment = z.infer<typeof AddProjectCommentSchema>;
 
 export type InviteUser = z.infer<typeof InviteUserSchema>;
 

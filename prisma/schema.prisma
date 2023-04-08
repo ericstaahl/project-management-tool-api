@@ -25,14 +25,15 @@ model project {
 }
 
 model todo {
-  todo_id     Int     @id @default(autoincrement())
-  title       String  @db.VarChar(255)
-  estimate    String  @db.VarChar(255)
-  description String  @db.VarChar(255)
-  project_id  Int
-  status      Status  @default(NOT_STARTED)
-  assignee    String?
-  project     project @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+  todo_id      Int            @id @default(autoincrement())
+  title        String         @db.VarChar(255)
+  estimate     String         @db.VarChar(255)
+  description  String         @db.VarChar(255)
+  project_id   Int
+  status       Status         @default(NOT_STARTED)
+  assignee     String?
+  project      project        @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+  todo_comment todo_comment[]
 
   @@index([project_id], map: "todo_project_id_fkey")
 }
@@ -44,6 +45,7 @@ model user {
   project         project[]         @relation("owner")
   project_comment project_comment[]
   users_members   users_members[]
+  todo_comment    todo_comment[]
 
   @@unique([user_id, username])
 }
@@ -62,20 +64,23 @@ model users_members {
 }
 
 model project_comment {
-  comment_id      Int               @id @unique @default(autoincrement())
-  user_id         Int
-  project_id      Int
-  content         String
-  reply_to_id     Int?
-  time_posted     DateTime          @default(now())
-  project         project           @relation(fields: [project_id], references: [project_id])
-  reply           project_comment?  @relation("CommentReply", fields: [reply_to_id], references: [comment_id])
-  project_comment project_comment[] @relation("CommentReply")
-  user            user              @relation(fields: [user_id], references: [user_id])
+  comment_id  Int      @id @unique @default(autoincrement())
+  user_id     Int
+  project_id  Int
+  content     String
+  time_posted DateTime @default(now())
+  project     project  @relation(fields: [project_id], references: [project_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
+}
 
-  @@index([project_id], map: "project_comment_project_id_fkey")
-  @@index([reply_to_id], map: "project_comment_reply_to_id_fkey")
-  @@index([user_id], map: "project_comment_user_id_fkey")
+model todo_comment {
+  comment_id  Int      @id @unique @default(autoincrement())
+  user_id     Int
+  todo_id     Int
+  content     String
+  time_posted DateTime @default(now())
+  todo        todo     @relation(fields: [todo_id], references: [todo_id])
+  user        user     @relation(fields: [user_id], references: [user_id])
 }
 
 enum Status {

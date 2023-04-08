@@ -4,11 +4,14 @@ import {
     AddTodoSchema,
     UpdateTodoSchema,
     UpdateTodo,
+    AddTodoComment,
+    AddTodoCommentSchema,
 } from '../schemas/todo_schema';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify';
 import prisma from '../prisma';
 import getUserFromJwt from '../utilities/getUserFromJwt';
+import checkUserAccess from '../utilities/checkUserAccess';
 
 export async function getTodos(request: GetTodosRequest, reply: FastifyReply) {
     const projectId = Number(request.params.id);
@@ -117,6 +120,15 @@ export async function getTodo(request: GetTodoRequest, reply: FastifyReply) {
             await prisma.todo.findUnique({
                 where: {
                     todo_id: todoId,
+                },
+                include: {
+                    todo_comment: {
+                        include: {
+                            user: {
+                                select: { username: true },
+                            },
+                        },
+                    },
                 },
             })
         );
@@ -252,6 +264,89 @@ export async function deleteTodo(
     }
 }
 
+export async function addTodoComment(
+    request: AddTodoCommentRequest,
+    reply: FastifyReply
+) {
+    const todoId = Number(request.params.todoId);
+    const parsedData = AddTodoCommentSchema.parse(request.body);
+
+    console.log('Request:', request);
+    console.log('Reply:', reply);
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        // check if user has access to project
+        if (userInfo?.user.user_id) {
+            try {
+                const { project_id } = await prisma.todo.findFirstOrThrow({
+                    where: {
+                        todo_id: todoId,
+                    },
+                    select: {
+                        project_id: true,
+                    },
+                });
+                await checkUserAccess(userInfo.user.user_id, project_id);
+            } catch (err) {
+                reply.status(401).send({
+                    message: `You don't have access to this project.`,
+                });
+                throw err;
+            }
+        } else
+            reply.status(401).send({
+                message: `You don't have access to this project.`,
+            });
+
+        if (userInfo?.user.user_id) {
+            const dataToSave: Prisma.todo_commentUncheckedCreateInput = {
+                ...parsedData,
+                todo_id: todoId,
+                user_id: userInfo.user.user_id,
+            };
+            return reply.send(
+                await prisma.todo_comment.create({
+                    data: dataToSave,
+                })
+            );
+        }
+    }
+}
+
+export async function deleteTodoComment(
+    request: DeleteCommentRequest,
+    reply: FastifyReply
+) {
+    const { id: commentId } = request.params;
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        if (userInfo?.user.user_id) {
+            return reply.send(
+                await prisma.todo_comment.deleteMany({
+                    where: {
+                        comment_id: Number(commentId),
+                        user_id: userInfo.user.user_id,
+                    },
+                })
+            );
+        }
+    }
+}
+
 export type AddTodoRequst = FastifyRequest<{
     Body: AddTodo;
     Params: { id: string };
@@ -277,4 +372,13 @@ export type UpdateTodoRequest = FastifyRequest<{
 
 export type DeleteTodoRequest = FastifyRequest<{
     Params: { id: string; todoId: string };
+}>;
+
+export type AddTodoCommentRequest = FastifyRequest<{
+    Body: AddTodoComment;
+    Params: { todoId: string };
+}>;
+
+export type DeleteCommentRequest = FastifyRequest<{
+    Params: { id: string };
 }>;

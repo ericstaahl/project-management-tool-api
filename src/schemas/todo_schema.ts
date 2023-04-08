@@ -64,6 +64,18 @@ export const UpdateTodoSchema = z.object({
         .optional(),
 });
 
+export const AddTodoCommentSchema = z.object({
+    content: z
+        .string({
+            required_error: 'Field is required.',
+            invalid_type_error: 'Field should be of type string.',
+        })
+        .min(10, 'Min. 10 characters')
+        .max(200, 'Max 200 characters'),
+});
+
+export type AddTodoComment = z.infer<typeof AddTodoCommentSchema>;
+
 export type UpdateTodo = z.infer<typeof UpdateTodoSchema>;
 
 export type AddTodo = z.infer<typeof AddTodoSchema>;
