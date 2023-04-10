@@ -345,6 +345,76 @@ export async function RemoveUser(
     }
 }
 
+export async function LeaveProject(
+    request: LeaveProjectRequest,
+    reply: FastifyReply
+) {
+    const { id: projectId } = request.params;
+
+    console.log('Request:', request);
+    console.log('Reply:', reply);
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        const userToRemove = await prisma.user.findUnique({
+            where: { username: userInfo?.user.username },
+            select: { user_id: true },
+        });
+
+        console.log(userToRemove);
+
+        // check if user owns project
+        if (userInfo?.user.user_id) {
+            const projectResult = await prisma.project.findFirst({
+                where: {
+                    user_id: userInfo.user.user_id,
+                    project_id: Number(projectId),
+                },
+            });
+            if (projectResult) {
+                return reply.status(405).send({
+                    message: `You are the project owner.`,
+                });
+            }
+        } else
+            reply.status(401).send({
+                message: `You don't have access to this project.`,
+            });
+
+        if (userInfo?.user.user_id && userToRemove !== null) {
+            await prisma.project.update({
+                where: {
+                    project_id: Number(projectId),
+                },
+                data: {
+                    members: {
+                        deleteMany: {
+                            user_id: userToRemove.user_id,
+                        },
+                    },
+                },
+            });
+            return reply.send(
+                await prisma.todo.updateMany({
+                    where: {
+                        project_id: Number(projectId),
+                        assignee: userInfo.user.username,
+                    },
+                    data: {
+                        assignee: null,
+                    },
+                })
+            );
+        }
+    }
+}
+
 export async function addProjectComment(
     request: AddProjectCommentRequest,
     reply: FastifyReply
@@ -447,6 +517,10 @@ export type InviteUserRequest = FastifyRequest<{
 
 export type RemoveUserRequest = FastifyRequest<{
     Body: RemoveUser;
+    Params: { id: string };
+}>;
+
+export type LeaveProjectRequest = FastifyRequest<{
     Params: { id: string };
 }>;
 

@@ -17,6 +17,8 @@ import {
     DeleteCommentRequest,
     RemoveUser,
     RemoveUserRequest,
+    LeaveProjectRequest,
+    LeaveProject,
 } from '../../controllers/project_controller';
 import verifyAccessToken from '../../utilities/verifyAccessToken';
 
@@ -69,6 +71,13 @@ export default async function (fastify: FastifyInstance) {
             preHandler: [verifyAccessToken<RemoveUserRequest>],
         },
         RemoveUser
+    );
+    fastify.put(
+        '/:id/invite',
+        {
+            preHandler: [verifyAccessToken<LeaveProjectRequest>],
+        },
+        LeaveProject
     );
     fastify.post(
         '/:id/comment',
