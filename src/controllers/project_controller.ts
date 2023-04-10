@@ -315,20 +315,29 @@ export async function RemoveUser(
         console.log(userToRemove);
 
         if (userInfo?.user.user_id && userToRemove !== null) {
-            return reply.send(
-                await prisma.project.update({
-                    where: {
-                        project_id_user_id: {
-                            project_id: Number(projectId),
-                            user_id: userInfo.user.user_id,
+            await prisma.project.update({
+                where: {
+                    project_id_user_id: {
+                        project_id: Number(projectId),
+                        user_id: userInfo.user.user_id,
+                    },
+                },
+                data: {
+                    members: {
+                        deleteMany: {
+                            user_id: userToRemove.user_id,
                         },
                     },
+                },
+            });
+            return reply.send(
+                await prisma.todo.updateMany({
+                    where: {
+                        project_id: Number(projectId),
+                        assignee: parsedData.username,
+                    },
                     data: {
-                        members: {
-                            deleteMany: {
-                                user_id: userToRemove.user_id,
-                            },
-                        },
+                        assignee: null,
                     },
                 })
             );
