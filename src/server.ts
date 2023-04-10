@@ -17,6 +17,7 @@ declare module 'fastify' {
 
 const ALLOWED_HOSTNAME = process.env.ALLOWED_HOSTNAME;
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const PORT = Number(process.env.PORT);
 
 server.register(cors, {
     origin: (origin, cb) => {
@@ -53,7 +54,7 @@ server.register(autoLoad, {
 
 const start = async () => {
     try {
-        await server.listen({ port: 3001 });
+        await server.listen({ port: PORT });
     } catch (error) {
         server.log.error(error);
         process.exit(1);
