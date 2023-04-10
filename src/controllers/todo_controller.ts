@@ -347,6 +347,52 @@ export async function deleteTodoComment(
     }
 }
 
+export async function assignSelf(
+    request: UpdateTodoRequest,
+    reply: FastifyReply
+) {
+    const projectId = Number(request.params.id);
+    const todoId = Number(request.params.todoId);
+
+    console.log('Request:', request);
+    console.log('Reply:', reply);
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        // check if user has access to project
+        if (userInfo?.user.user_id) {
+            try {
+                await checkUserAccess(userInfo.user.user_id, projectId);
+            } catch (err) {
+                reply.status(401).send({
+                    message: `You don't have access to this project.`,
+                });
+                throw err;
+            }
+        } else
+            reply.status(401).send({
+                message: `You don't have access to this project.`,
+            });
+
+        if (userInfo?.user.user_id) {
+            return reply.send(
+                await prisma.todo.updateMany({
+                    data: {
+                        assignee: userInfo.user.username,
+                    },
+                    where: { todo_id: todoId },
+                })
+            );
+        }
+    }
+}
+
 export type AddTodoRequst = FastifyRequest<{
     Body: AddTodo;
     Params: { id: string };
@@ -367,6 +413,10 @@ export type GetTodoRequest = FastifyRequest<{
 
 export type UpdateTodoRequest = FastifyRequest<{
     Body: UpdateTodo;
+    Params: { id: string; todoId: string };
+}>;
+
+export type AssignSelfRequest = FastifyRequest<{
     Params: { id: string; todoId: string };
 }>;
 
