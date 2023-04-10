@@ -7,6 +7,8 @@ import {
     InviteUser,
     AddProjectComment,
     AddProjectCommentSchema,
+    RemoveUser,
+    RemoveUserSchema,
 } from '../schemas/project_schema';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import prisma from '../prisma';
@@ -282,6 +284,58 @@ export async function inviteUser(
     }
 }
 
+export async function RemoveUser(
+    request: RemoveUserRequest,
+    reply: FastifyReply
+) {
+    const parsedData = RemoveUserSchema.parse(request.body);
+    const { id: projectId } = request.params;
+
+    console.log('Request:', request);
+    console.log('Reply:', reply);
+
+    if (
+        request.headers.authorization &&
+        request.headers.authorization.startsWith('Bearer')
+    ) {
+        const userInfo = getUserFromJwt(
+            request.headers.authorization.split(' ')[1]
+        );
+
+        if (parsedData.username === userInfo?.user.username) {
+            return reply
+                .code(400)
+                .send({ message: 'Cannot remove owner of project.' });
+        }
+        const userToRemove = await prisma.user.findUnique({
+            where: { username: parsedData.username },
+            select: { user_id: true },
+        });
+
+        console.log(userToRemove);
+
+        if (userInfo?.user.user_id && userToRemove !== null) {
+            return reply.send(
+                await prisma.project.update({
+                    where: {
+                        project_id_user_id: {
+                            project_id: Number(projectId),
+                            user_id: userInfo.user.user_id,
+                        },
+                    },
+                    data: {
+                        members: {
+                            deleteMany: {
+                                user_id: userToRemove.user_id,
+                            },
+                        },
+                    },
+                })
+            );
+        }
+    }
+}
+
 export async function addProjectComment(
     request: AddProjectCommentRequest,
     reply: FastifyReply
@@ -379,6 +433,11 @@ export type UpdateProjectRequest = FastifyRequest<{
 
 export type InviteUserRequest = FastifyRequest<{
     Body: InviteUser;
+    Params: { id: string };
+}>;
+
+export type RemoveUserRequest = FastifyRequest<{
+    Body: RemoveUser;
     Params: { id: string };
 }>;
 

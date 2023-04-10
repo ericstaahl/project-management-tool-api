@@ -90,6 +90,13 @@ export const InviteUserSchema = z.object({
     }),
 });
 
+export const RemoveUserSchema = z.object({
+    username: z.string({
+        required_error: 'userId is required.',
+        invalid_type_error: 'userId should be of type string.',
+    }),
+});
+
 export const AddProjectCommentSchema = z.object({
     content: z
         .string({
@@ -103,5 +110,7 @@ export const AddProjectCommentSchema = z.object({
 export type AddProjectComment = z.infer<typeof AddProjectCommentSchema>;
 
 export type InviteUser = z.infer<typeof InviteUserSchema>;
+
+export type RemoveUser = z.infer<typeof InviteUserSchema>;
 
 export type UpdateProject = z.infer<typeof UpdateProjectSchema>;
