@@ -56,7 +56,7 @@ model users_members {
   username   String
   project_id Int?
   role       String?  @default("member")
-  project    project? @relation(fields: [project_id], references: [project_id])
+  project    project? @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
   user       user     @relation(fields: [user_id, username], references: [user_id, username])
 
   @@unique([project_id, user_id])
