@@ -163,11 +163,22 @@ export async function getMembers(
             await prisma.user.findMany({
                 select: { user_id: true, username: true },
                 where: {
-                    users_members: {
-                        some: {
-                            project_id: { equals: projectId },
+                    OR: [
+                        {
+                            users_members: {
+                                some: {
+                                    project_id: { equals: projectId },
+                                },
+                            },
                         },
-                    },
+                        {
+                            project: {
+                                some: {
+                                    project_id: { equals: projectId },
+                                },
+                            },
+                        },
+                    ],
                 },
             })
         );
