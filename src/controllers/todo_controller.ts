@@ -151,18 +151,17 @@ export async function addTodo(request: AddTodoRequst, reply: FastifyReply) {
         // check if user has access to project
         if (userInfo?.user.user_id) {
             try {
-                await prisma.project.findFirstOrThrow({
-                    where: {
-                        project_id: Number(projectId),
-                        user_id: userInfo.user.user_id,
-                    },
-                });
+                await checkUserAccess(userInfo.user.user_id, Number(projectId));
             } catch (err) {
-                return reply.status(401).send({
+                reply.status(401).send({
                     message: `You don't have access to this project.`,
                 });
+                throw err;
             }
-        }
+        } else
+            reply.status(401).send({
+                message: `You don't have access to this project.`,
+            });
 
         const dataToSave: Prisma.todoUncheckedCreateInput = {
             ...parsedData,
